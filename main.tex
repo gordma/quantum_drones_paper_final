@@ -1,3 +1,52 @@
+% ================================================================
+%  main.tex  --  Quantum-Compatible Drone-VRP (arXiv v1)
+% ================================================================
+\documentclass[11pt]{article}      % or IEEEtran, lncs, revtex4, etc.
+
+% ---------- Preamble -------------------------------------------------
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{siunitx}           % \SI units
+\usepackage{graphicx}
+\usepackage{subcaption}        % for subfigures
+\usepackage{booktabs}          % nice tables
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{hyperref}
+\hypersetup{colorlinks, citecolor=blue, linkcolor=blue}
+
+% ---------- Title & Author ------------------------------------------
+\title{A Compressed-Qubit, Risk-Aware Quantum Pipeline\\
+       for the Drone Vehicle Routing Problem}
+\author{%
+  Gordon Ma\quad
+  Dimitris G. Angelakis \footnotemark[1]
+}
+\date{\today}
+
+% ---------- Document -------------------------------------------------
 \begin{document}
+\maketitle
+% \begin{abstract}
+%   \input{sections/abstract}
+% \end{abstract}
+
+% ---------- Main Sections -------------------------------------------
+\input{sections/intro}
+\input{sections/methods}
+\input{sections/experiments}
+\input{sections/results}
+\input{sections/discussion}   % optional
+% \input{sections/conclusion}
+
+% ---------- References ----------------------------------------------
+\bibliographystyle{unsrt}      % or IEEEtran, plainnat, etc.
+\bibliography{refs}
+
+% ---------- Appendix (optional) -------------------------------------
+\newpage
+\appendix
+% \input{sections/appendix_A_algorithms}
+% \input{sections/appendix_B_full_sweep}
 
 \end{document}
