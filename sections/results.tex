@@ -15,7 +15,7 @@ solutions are both \	extit{good} and \	extit{consistent}.
 \begin{figure}[htb]
     \centering
     % TODO: include softness Pareto figure
-    \includegraphics[width=0.7\linewidth]{figures/final/00_softness_pareto.png}
+    \includegraphics[width=0.7\linewidth]{figures/00_softness_pareto.png}
     \caption{Pareto frontier of GA performance (mean best cost) versus consistency
     (CV) across the route‐generation softness sweep ($n_{\text{routes}}=2048$,
     $30$ seeds each).  Although $S=0.7$ attains the best mean cost, the
@@ -99,10 +99,10 @@ To ensure the quantum advantage is not confined to a narrow hyperparameter regim
 
 \begin{figure}[htb]
     \centering
-    % TODO: Insert vqe_alpha_layer_heatmap.png with enhanced colormap and annotations
+    \includegraphics[width=0.8\linewidth]{figures/vqe_alpha_layer_heatmap.png}
     \caption{CVaR-VQE performance across risk parameter $\alpha$ and circuit depth $L$. Shallow circuits ($L \leq 2$) consistently outperform, with $\alpha \approx 0.05$ emerging as optimal across depths. Controls at $\alpha = 0.50$ (median-risk) and $\alpha = 1.00$ (mean-cost) confirm that focusing on the worst \emph{5--10\%} of outcomes yields the greatest improvement. An over-parameterised depth $L = 5$ slice further shows that adding variational layers beyond two offers no additional benefit and can slightly degrade performance. The broad low-cost region therefore demonstrates a \emph{robust}, \emph{shallow-circuit} quantum advantage independent of precise hyper-parameter tuning.}
     \label{fig:vqe_heatmap}
-\end{figure}
+\end{figure>
 
 Key observations:
 \begin{itemize}[nosep]
@@ -157,10 +157,10 @@ To understand the optimization mechanisms underlying quantum advantage, we analy
 
 \begin{figure}[htb]
     \centering
-    % TODO: Generate learning_curves_comparison.png with professional styling
+    \includegraphics[width=0.8\linewidth]{figures/02_ga_vs_vqe_learning_curve.png}
     \caption{Convergence comparison between CVaR-VQE (Aggressive-TPE) and mutation-optimized GA. VQE demonstrates faster initial convergence and achieves lower asymptotic cost. The plateau at $\approx 70$ iterations validates our reduced-budget experimental design.}
     \label{fig:learning_curves}
-\end{figure}
+\end{figure>
 
 Convergence analysis reveals:
 \begin{itemize}[nosep]
