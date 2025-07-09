@@ -1,0 +1,67 @@
+\label{app:algorithms}
+
+This appendix provides explicit pseudocode for the key classical algorithms employed in our optimisation pipeline. Algorithms~\ref{alg:softmax}, \ref{alg:dropdup}, and~\ref{alg:scheduler} respectively describe the greedy soft-max generation of feasible drone routes, greedy removal of overlapping routes within launch waves, and the ascending-time scheduling heuristic for assigning drone missions.
+
+\vspace{10pt}
+
+\begin{algorithm}[H]
+\caption{GreedySoftmaxRouteGen: Generate Feasible Route Pool}
+\label{alg:softmax}
+\begin{algorithmic}[1]
+\Require graph $G$, soft-max temperature $S$, battery limit $B_{\max}$, payload limit $Q_{\max}$
+\State $R \gets [;]$
+\For{$run = 1,2,\dots$}
+\State $path \gets [0]$, $\textit{unvisited}\gets V\setminus{0}$
+\While{feasible node exists}
+\State compute incremental travel times $\Delta t$ and battery usages $\Delta b$ to feasible next nodes
+\State sample next node probabilistically: $p(v) \propto \exp(-\Delta t_v/S)$
+\State update $path$, drone battery state, and payload
+\EndWhile
+\If{\Call{Feasible}{$path$}} \Comment{Checks constraints $B_{\max},Q_{\max}$}
+\State $R \gets R \cup {\text{Route}(path)}$
+\EndIf
+\If{$|R|=R_{TARGET}$} \textbf{break}
+\EndFor
+\State \Return feasible route pool $R$
+\end{algorithmic}
+\end{algorithm}
+
+\vspace{10pt}
+
+\begin{algorithm}[H]
+\caption{GreedyDropDuplicates: Remove Overlapping Routes}
+\label{alg:dropdup}
+\begin{algorithmic}[1]
+\Require route set $\mathcal{R}$ sorted by ascending travel time
+\State $covered \gets \mathbf{0}$ \Comment{bit-mask of served nodes}
+\State $R' \gets [;]$
+\ForAll{routes $r \in \mathcal{R}$}
+\If{$(m^V_r ;&; covered) = \mathbf{0}$}
+\State $R' \gets R' \cup {r}$
+\State $covered \gets covered ;|; m^V_r$
+\EndIf
+\EndFor
+\State \Return filtered non-overlapping route set $R'$
+\end{algorithmic}
+\end{algorithm}
+
+\vspace{10pt}
+
+\begin{algorithm}[H]
+\caption{AscendingTimeScheduler: Assign Routes to Drones}
+\label{alg:scheduler}
+\begin{algorithmic}[1]
+\Require wave-to-route dictionary $W$, drone set $D$
+\State $T_{\max}\gets0$, $A\gets[;]$
+\ForAll{waves $w\in$ \Call{SortedKeys}{$W$}}
+\State heapify($D$) \Comment{key = drone availability time}
+\ForAll{$r \in$ \Call{SortAsc}{$W[w]$, travel_time}}
+\State $d \gets$ heappop($D$)
+\State \Call{AssignRoute}{$d,r$} \Comment{Updates drone $d$ availability}
+\State $T_{\max}\gets\max(T_{\max}, d.\text{end})$
+\State $A \gets A \cup {(d,r)}$; heappush($D,d$)
+\EndFor
+\EndFor
+\State \Return assignments $A$ and makespan $T_{\max}$
+\end{algorithmic}
+\end{algorithm}

@@ -13,6 +13,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{hyperref}
+\usepackage{bbm}
 \hypersetup{colorlinks, citecolor=blue, linkcolor=blue}
 
 % ---------- Title & Author ------------------------------------------
@@ -41,12 +42,12 @@
 
 % ---------- References ----------------------------------------------
 \bibliographystyle{unsrt}      % or IEEEtran, plainnat, etc.
-\bibliography{refs}
+\bibliography{references.bib}
+
 
 % ---------- Appendix (optional) -------------------------------------
 \newpage
 \appendix
-% \input{sections/appendix_A_algorithms}
-% \input{sections/appendix_B_full_sweep}
+\input{appendices/appendix_A_algorithms}
 
 \end{document}
