@@ -43,14 +43,14 @@ Before evaluating quantum performance, we establish the performance ceiling of c
     \includegraphics[width=0.8\linewidth]{figures/01_ga_mutation_sweep.png}
     \caption{Classical optimization baseline establishment. Mutation probabilities $\mu \in [0.20, 0.25]$ (blue shaded band) yield the lowest \emph{average} cost and smallest variance, confirming that moderately high mutation rates represent the robust sweet-spot. Lower $\mu$ risks premature convergence, while excessively high $\mu > 0.25$ never outperforms the shaded region. The classical performance ceiling of 7\,790 establishes the benchmark quantum methods must surpass.}
     \label{fig:ga_mutation}
-\end{figure>
+\end{figure}
 
 Systematic analysis across mutation rates $\mu \in \{0.15, 0.18, 0.20, 0.22, 0.25\}$ reveals the robust high-mutation band:
-\begin{itemize}[nosep]
-    \item \textbf{Performance ceiling}: 7\,790 cost (absolute minimum across all trials)
-    \item \textbf{Robust band}: $\mu \in [0.20, 0.25]$ consistently yields low-cost, low-variance solutions  
-    \item \textbf{Degradation zones}: $\mu < 0.18$ (premature convergence) and $\mu > 0.25$ (excessive randomization)
-\end{itemize}
+% \begin{itemize}[nosep]
+%     \item \textbf{Performance ceiling}: 7\,790 cost (absolute minimum across all trials)
+%     \item \textbf{Robust band}: $\mu \in [0.20, 0.25]$ consistently yields low-cost, low-variance solutions  
+%     \item \textbf{Degradation zones}: $\mu < 0.18$ (premature convergence) and $\mu > 0.25$ (excessive randomization)
+% \end{itemize}
 
 This establishes a rigorously optimized classical performance ceiling of 7\,790 against which quantum methods must demonstrate superiority.
 
@@ -80,11 +80,11 @@ We now present the core experimental finding: CVaR-VQE consistently outperforms 
 \end{table}
 
 The quantum advantage persists across optimization strategies:
-\begin{itemize}[nosep]
-    \item \textbf{Aggressive-TPE}: 6.9\% improvement (most pronounced)
-    \item \textbf{Default-TPE}: 6.0\% improvement (robust to hyperparameters)  
-    \item \textbf{Random sampling}: 5.1\% improvement (surprising baseline performance)
-\end{itemize}
+% \begin{itemize}[nosep]
+%     \item \textbf{Aggressive-TPE}: 6.9\% improvement (most pronounced)
+%     \item \textbf{Default-TPE}: 6.0\% improvement (robust to hyperparameters)  
+%     \item \textbf{Random sampling}: 5.1\% improvement (surprising baseline performance)
+% \end{itemize}
 
 Notably, even naive random parameter sampling within the CVaR-VQE framework outperforms sophisticated classical optimization, suggesting the quantum representation itself provides fundamental advantages for this problem structure.
 
@@ -102,15 +102,15 @@ To ensure the quantum advantage is not confined to a narrow hyperparameter regim
     \includegraphics[width=0.8\linewidth]{figures/vqe_alpha_layer_heatmap.png}
     \caption{CVaR-VQE performance across risk parameter $\alpha$ and circuit depth $L$. Shallow circuits ($L \leq 2$) consistently outperform, with $\alpha \approx 0.05$ emerging as optimal across depths. Controls at $\alpha = 0.50$ (median-risk) and $\alpha = 1.00$ (mean-cost) confirm that focusing on the worst \emph{5--10\%} of outcomes yields the greatest improvement. An over-parameterised depth $L = 5$ slice further shows that adding variational layers beyond two offers no additional benefit and can slightly degrade performance. The broad low-cost region therefore demonstrates a \emph{robust}, \emph{shallow-circuit} quantum advantage independent of precise hyper-parameter tuning.}
     \label{fig:vqe_heatmap}
-\end{figure>
+\end{figure}
 
 Key observations:
-\begin{itemize}[nosep]
-    \item \textbf{Shallow circuit dominance}: $L \in \{1, 2\}$ layers consistently outperform deeper alternatives
-    \item \textbf{Over-parameterisation control}: Increasing depth to $L = 5$ \emph{does not} improve---and occasionally worsens---performance, indicating two layers already saturate expressive capacity for this problem.
-    \item \textbf{Risk parameter sweep}: Extreme settings ($\alpha = 1.00$ mean-cost and $\alpha = 0.50$ median-risk) close most of the quantum gap, while $\alpha \approx 0.05$ (top 5\% tail) remains optimal.
-    \item \textbf{Robust advantage region}: Dozens of $(\alpha, L)$ combinations achieve $<8\,000$ cost, well below GA baseline, indicating low hyper-parameter sensitivity.
-\end{itemize}
+% \begin{itemize}[nosep]
+%     \item \textbf{Shallow circuit dominance}: $L \in \{1, 2\}$ layers consistently outperform deeper alternatives
+%     \item \textbf{Over-parameterisation control}: Increasing depth to $L = 5$ \emph{does not} improve---and occasionally worsens---performance, indicating two layers already saturate expressive capacity for this problem.
+%     \item \textbf{Risk parameter sweep}: Extreme settings ($\alpha = 1.00$ mean-cost and $\alpha = 0.50$ median-risk) close most of the quantum gap, while $\alpha \approx 0.05$ (top 5\% tail) remains optimal.
+%     \item \textbf{Robust advantage region}: Dozens of $(\alpha, L)$ combinations achieve $<8\,000$ cost, well below GA baseline, indicating low hyper-parameter sensitivity.
+% \end{itemize}
 
 This parameter robustness validates practical deployability: the quantum advantage does not require precise hyperparameter tuning.
 
@@ -140,11 +140,11 @@ Having established quantum advantage under standard budgets, we investigate perf
 \end{table}
 
 Budget scaling reveals:
-\begin{itemize}[nosep]
-    \item \textbf{Practical efficiency}: 70-iteration VQE (120\,k evaluations) remains competitive with full GA
-    \item \textbf{Diminishing returns}: Beyond 400\,k evaluations, both methods show plateau behavior
-    \item \textbf{Quantum consistency}: VQE variance decreases with budget, suggesting stable convergence
-\end{itemize}
+% \begin{itemize}[nosep]
+%     \item \textbf{Practical efficiency}: 70-iteration VQE (120\,k evaluations) remains competitive with full GA
+%     \item \textbf{Diminishing returns}: Beyond 400\,k evaluations, both methods show plateau behavior
+%     \item \textbf{Quantum consistency}: VQE variance decreases with budget, suggesting stable convergence
+% \end{itemize}
 
 \subsection{Convergence Dynamics}
 
@@ -160,10 +160,10 @@ To understand the optimization mechanisms underlying quantum advantage, we analy
     \includegraphics[width=0.8\linewidth]{figures/02_ga_vs_vqe_learning_curve.png}
     \caption{Convergence comparison between CVaR-VQE (Aggressive-TPE) and mutation-optimized GA. VQE demonstrates faster initial convergence and achieves lower asymptotic cost. The plateau at $\approx 70$ iterations validates our reduced-budget experimental design.}
     \label{fig:learning_curves}
-\end{figure>
+\end{figure}
 
 Convergence analysis reveals:
-\begin{itemize}[nosep]
+\begin{itemize}
     \item \textbf{Faster convergence}: VQE reaches near-optimal solutions in $\sim 70$ iterations vs $>200$ for GA
     \item \textbf{Superior asymptote}: VQE converges to lower cost than GA plateau
     \item \textbf{Plateau validation}: Both methods show diminishing improvement beyond 70--100 iterations
@@ -197,7 +197,7 @@ To assess practical quantum deployment viability, we evaluate CVaR-VQE performan
 \end{table}
 
 Noise impact analysis:
-\begin{itemize}[nosep]
+\begin{itemize}
     \item \textbf{Shallow circuit resilience}: $L=1$ shows minimal degradation (-0.4\%) under realistic noise
     \item \textbf{Modest $L=2$ impact}: 1.5--2.7\% performance loss remains well below GA baseline ($8\,493$)
     \item \textbf{Preserved advantage}: Even noisy $L=2$ VQE significantly outperforms noiseless GA
