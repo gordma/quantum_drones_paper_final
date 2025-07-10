@@ -1,379 +1,88 @@
-% \section{Methods}\label{sec:methods}
+\section{Methods}
 
-% \subsection{Problem Graph and Route Pool}\label{sec:graph}
+\subsection{Overview}
 
-% We model the operational area as an undirected graph
-% \(G=(V,E)\) where \(|V| = n\) and node \(0\) is the depot.
-% An edge is created for every pair of customer nodes appearing in the
-% Delaunay triangulation of their planar coordinates; we then connect the
-% depot to \emph{every} customer, forming a sparse ``star–plus–local''
-% topology that matches typical drone-return logistics.
-% Thus connectivity is guranteed for a drone to return from any node to the depot,
-% yet we preserve realistic sparse topology. 
-% Each edge stores distance~\(d_{uv}\), travel
-% time~\(t_{uv}=d_{uv}/v_{d}\) (constant cruise speed~\(v_{d}\)),
-% battery usage~\(b_{uv}=t_{uv}\) and a boolean
-% \(c_{uv}=1\) if it belongs to a regulatory no-fly corridor.\footnote{%
-% Travel times and battery cost are identical in our instance; separating
-% them is straightforward.}
+To avoid exponential qubit scaling, we split the drone routing problem into two stages. We first filter thousands of constraint-violating routes classically, then apply quantum optimization to select the best feasible subset. This hybrid approach reduces a 275-qubit QUBO problem to just 13 qubits while preserving solution quality.
 
-% \vspace{2pt}\noindent
-% \textbf{Greedy soft-max route generator.}
-% Algorithm~1 (Appendix~A) repeatedly grows depot-to-depot paths using a
-% soft-max on incremental travel cost; feasibility is checked against
-% battery~\(B_{\max}\) and payload~\(Q_{\max}\).
-% After 2\,000 random seeds we retain the first
-% \(N=2\,048\) routes \(r\) that satisfy all constraints and pre-compute
-% \(\text{time}(r), \text{battery}(r)\) together with
-% node/edge bit-masks \(\boldsymbol{m}^V_r,\boldsymbol{m}^{E}_r\).
-% \emph{Feasibility is henceforth guaranteed};
-% the optimisation problem concerns \emph{only} combinatorial subset
-% selection.
+\subsection{Classical Preprocessing and Feasibility Filtering}
 
-% % ------------------------------------------------------------------
-% \begin{algorithm}[H]
-%     \caption{GreedySoftmaxRouteGen}
-%     \label{alg:softmax}
-%     \begin{algorithmic}[1]
-%     \Require graph $G$, temperature $S$, battery $B_{\max}$, payload $Q_{\max}$
-%     \State $R \gets [\;]$
-%     \For{$run = 1,2,\dots$}
-%        \State $path \gets [0]$, $\textit{unvisited}\gets V\setminus\{0\}$
-%        \While{feasible node exists}
-%            \State compute $\Delta t$ and $\Delta b$ for each feasible next node
-%            \State draw next node with $\text{softmax}(-\Delta t/S)$
-%            \State update $path$, battery, payload
-%        \EndWhile
-%        \If{\Call{Feasible}{$path$}} \Comment{meets $B_{\max},Q_{\max}$}
-%             \State add new Route$(path)$ to $R$
-%        \EndIf
-%        \If{$|R|=2\,048$} \textbf{break}
-%     \EndFor
-%     \State \Return $R$
-%     \end{algorithmic}
-% \end{algorithm}
-    
+Directly optimizing drone routes considering all constraints remains computationally challenging. Therefore, we introduce a classical preprocessing phase that dramatically reduces subsequent computational complexity. We represent the operational environment as a sparse undirected graph $G=(V,E)$, where nodes correspond to depots and customer locations. Edges between nodes are established via a Delaunay triangulation augmented by direct depot-to-customer connections, forming a practical, sparse ``star-plus-local'' topology. Each edge $(u,v)$ is annotated with travel time $t_{uv}$, battery consumption $b_{uv}$, and no-fly zone constraints $c_{uv}$.
 
-% \subsection{Subset-Route Decision Space}
+We generate feasible drone routes via a greedy soft-max heuristic (Algorithm~\ref{alg:softmax}, Appendix~\ref{app:algorithms}). This algorithm iteratively selects subsequent nodes probabilistically based on incremental travel cost and a temperature parameter $S$ that balances exploration and exploitation. Any generated route violating battery capacity $B_{\max}$ or payload constraints $Q_{\max}$ is immediately discarded, guaranteeing feasibility by construction.
 
-% Selecting exactly \(k=10\) route–wave pairs
-% \(\mathcal{S}=\{(r_i,w_i)\}_{i=1}^{k}\)
-% with \(w_i\in\{0,\dots,M-1\}, M=4\) yields
-% \(\binom{N}{k}M^{k}\!\approx\! 2.6\times10^{26}\) possibilities.
-% We encode each pair by its \emph{index}:
+\subsection{Subset-Route Combinational Optimization}
 
-% % ------------------------------------------------------------------
-% % Eq. 2  (place in §2.2 Decision Encoding)
-% \begin{equation}
-%     \label{eq:logindex}
-%     r \;=\;
-%     \Bigl(\sum_{j=0}^{n_r-1}2^{j} z_j\Bigr)\bmod N,
-%     \qquad
-%     w \;=\;
-%     \Bigl(\sum_{j=0}^{n_w-1}2^{j} z_{n_r+j}\Bigr)\bmod M.
-%     \end{equation}
-    
+Even after classical preprocessing, directly optimizing thousands of feasible routes remains infeasible. Thus, we recast the drone routing problem as a combinational optimization task: selecting exactly $k=10$ routes from a reduced candidate pool of $N=2048$ feasible routes, assigning each selected route to one of $M=4$ discrete launch waves. The resulting search space contains $\binom{2048}{10} \times 4^{10} \approx 3.6 \times 10^{32}$ possible configurations.
 
-% \noindent with \(n_r=\lceil\log_2 N\rceil=11\) and
-% \(n_w=\lceil\log_2 M\rceil=2\).
-% Classically this is a 130-bit chromosome; in the quantum circuit only
-% \(n_r+n_w=13\) \emph{qubits} are needed.
+Classical heuristics manage operational constraints by removing overlapping routes within each wave using a greedy duplicate removal strategy (Algorithm~\ref{alg:dropdup}) and assigning routes to drones in ascending travel-time order (Algorithm~\ref{alg:scheduler}). This enables the quantum optimization to focus purely on combinational subset selection without additional constraint complexity.
 
-% \vspace{2pt}\noindent
-% \textbf{Duplicate repair.}  
-% Within each wave we remove overlapping routes via the
-% first-occurrence rule:
+\subsection{Qubit-Efficient Quantum Representation}
 
-% % ------------------------------------------------------------------
-% \begin{algorithm}[H]
-%     \caption{GreedyDropDuplicates}
-%     \label{alg:dropdup}
-%     \begin{algorithmic}[1]
-%     \Procedure{DropDup}{$\mathcal{R}$}
-%       \State $covered \gets \mathbf{0}$ \Comment{bit‑mask of served nodes}
-%       \State $R' \gets [\;]$
-%       \ForAll{$r \in$ \Call{SortAsc}{$\mathcal{R}$, travel\_time}}
-%            \If{$\lnot(covered \;\&\; m^V_r)$}
-%                \State append $r$ to $R'$
-%                \State $covered \gets covered \;|\; m^V_r$
-%            \EndIf
-%       \EndFor
-%       \State \Return $R'$
-%     \EndProcedure
-% \end{algorithmic}
-% \end{algorithm}
-    
+This section presents the 13-qubit encoding that enables quantum optimization on near-term devices. A logarithmic index packs 2,048 routes and four launch waves into just 13 qubits—a 95% reduction from traditional QUBO encodings. Each route-wave pair follows:
 
-% \noindent The path of a retained route is \emph{not} modified; empirical
-% tests showed this suffices to achieve 100 \% node coverage once
-% penalties are set (Section~\ref{sec:cost}).
-
-% \subsection{Ascending-Time Wave Scheduler}
-
-% For each wave we assign routes to a drone min-heap in ascending
-% travel-time order (Algorithm~2).  
-% The classical longest-processing-time (LPT) variant is obtained by
-% reversing line 2; we leave this to future work.
-
-% % ------------------------------------------------------------------
-% \begin{algorithm}[H]
-%     \caption{AscendingTimeScheduler}
-%     \label{alg:scheduler}
-%     \begin{algorithmic}[1]
-%     \Procedure{Schedule}{$W$ waves, $D$ drones}
-%       \State $T_{\max}\gets0$, $A\gets[\;]$
-%       \ForAll{$w\;\textbf{in}$ \Call{SortedKeys}{$W$}}
-%           \State heapify($D$) \Comment{key = availability\_time}
-%           \ForAll{$r \in$ \Call{SortAsc}{$W[w]$, travel\_time}}
-%                \State $d \gets$ heappop($D$)
-%                \State \Call{Assign}{$d,r$} \Comment{updates $d.\text{end}$}
-%                \State $T_{\max}\gets\max(T_{\max}, d.\text{end})$
-%                \State append record to $A$; heappush($D,d$)
-%           \EndFor
-%       \EndFor
-%       \State \Return $(A, T_{\max})$
-%     \EndProcedure
-% \end{algorithmic}
-% \end{algorithm}
-    
-
-% \subsection{Cost Oracle}\label{sec:cost}
-
-% Let \(\mathbb 1_{v\text{ served}}\) and
-% \(\mathbb 1_{uv\text{ traversed}}\) be binary indicators extracted from
-% bit-masks.
-% Our scalar objective mirrors the code:
-
-% % ------------------------------------------------------------------
-% % Eq. 1  (place in §2.4 Cost Oracle)
-% \begin{equation}
-%     \label{eq:cost}
-%     \boxed{
-%     C(\mathcal{S}) \;=\;
-%     10\,T_{\max}
-%     \;+\;
-%     \lambda_E \sum_{(u,v)\in E_c}
-%            \bigl(1-\mathbb 1_{uv}\bigr)^{\!2}
-%     \;+\;
-%     \lambda_V \sum_{v>0}
-%            \bigl(1-\mathbb 1_{v}\bigr)^{\!2}
-%     \;+\;
-%     \lambda_0 \sum_{v>0}
-%            \mathbb 1_{v}^{\mathrm{miss}}
-%     \;+\;
-%     \lambda_W \,
-%             \bigl(\text{overbook}\bigr)^{2}}
-%     \end{equation}
-    
-
-% \noindent with default weights
-% \(\lambda_T\!=\!10,\;
-%  \lambda_V\!=\!10,\;
-%  \lambda_0\!=\!50\lambda_V,\;
-%  \lambda_E\!=\!10,\;
-%  \lambda_W\!=\!20\).
-% The high \(\lambda_0\) virtually prohibits missed deliveries; all best
-% solutions we report achieved 100 \% coverage.
-
-% \subsection{Variational Quantum Circuit}
-
-% We use the hardware-efficient
-% \(\mathrm{SU}(2)\) ansatz (Qiskit) on the 13-qubit register,
-
-% \[
-% U^{(L)}_{\boldsymbol{\theta}}
-% =\bigl[\;{\rm RY}(\theta)\;{\rm CZ}\bigr]^{L},
-% \quad L\in\{1,2\},
-% \]
-
-% \noindent sampled with \(N_{\text{shots}}=4\,096\) shots—within daily
-% budgets of current 127-qubit IBM back-ends.  Circuit depth remains
-% below 180 two-qubit gates for \(L=2\).
-
-% \subsection{Noise-Aware CVaR Objective}
-
-% The CVaR metric averages the best (lowest-cost) α-fraction of Monte-Carlo samples, following the noise-mitigation strategy of the CVaR-VQE proposal \cite{barkoutsos2020cvar}.
-
-% From shot counts we draw \(N_{\mathrm{mc}}=2\,000\) $k$-tuples and obtain
-% cost vector \(\boldsymbol{c}\).  The CVaR tail metric is
-
-% % ------------------------------------------------------------------
-% % Eq. 3  (place in §2.4 CVaR Objective)
-% \begin{equation}
-%     \label{eq:cvar}
-%     J_{\alpha}(\boldsymbol{c}) \;=\;
-%     \frac{1}{\alpha K}
-%     \sum_{i=1}^{\alpha K} c_{(i)},
-%     \quad
-%     0<\alpha\le 1,
-% \end{equation}
-    
-
-% \noindent where \(c_{(i)}\) are costs sorted ascending, so the best $\alpha$-percent of costs are sampled. 
-% Its estimator variance combines independent shot and Monte-Carlo terms:
-
-% % ------------------------------------------------------------------
-% % Eq. 4  (place just after Eq. 3)
-% \begin{equation}
-%     \label{eq:variance}
-%     \mathrm{Var}\!\bigl[J_{\alpha}\bigr]
-%     =\;\underbrace{\frac{\sigma_C^{2}}{N_{\text{mc}}}}_{\text{MC sampling}}
-%     \;+\;
-%     \underbrace{\sum_{i}
-%             \frac{p_i(1-p_i)}{N_{\text{shots}}}\,
-%             \bigl(C_i^{\mathrm{tail}}\bigr)^{2}}_{\text{shot noise}},
-% \end{equation}
-    
-% \noindent
-% \textbf{Interpretation of the shot–noise term.}
-% Let $p_i=\Pr\!\bigl(\text{bitstring}=i\bigr)$ denote the probability of
-% measuring the $13$-qubit string ${i}$, which encodes the concatenation
-% $\ket{\texttt{route}_i}\ket{\texttt{wave}_i}$.  
-% Define
-% $C_i^{\mathrm{tail}} = C_i$ if the corresponding cost sample lies
-% within the \emph{best} $\alpha$-fraction used by CVaR, and
-% $C_i^{\mathrm{tail}} = 0$ otherwise.
-% Because $p_i$ already captures the joint chance of observing both a
-% route index \emph{and} its wave index, Equation~\eqref{eq:variance}
-% automatically accounts for the additional
-% ``compression'' of two logical variables into a single bitstring
-% distribution; no extra factor is required.
-% Consequently CVaR implicitly \emph{down-weights} high-variance, low-%
-% probability strings—reducing the effective shot noise that drives the
-% optimiser.
-
-
-% \subsection{Bayesian Hyper-parameter Search}\label{sec:bo}
-
-% Parameter vectors \(\boldsymbol{\theta}\) are optimised with
-% Optuna TPE\cite{akiba2019optuna}.
-% We test two samplers:
-% (i) \emph{Default} (prior\_weight=1.0, $24$ EI samples) and
-% (ii) \emph{Aggressive} (prior\_weight=0.5, $64$ EI samples).
-% A MedianPruner terminates trials whose running best is above the median
-% of completed trials after one-third of the budget.
-% Optimiser budget is \(N_{\text{eval}}=100\) oracle calls—identical to
-% the GA baseline.
-
-% \paragraph{Tree–Parzen Estimator (TPE).}
-% TPE replaces Gaussian-process surrogate models with two
-% non-parametric density estimates:
-% $q_{\text{good}}(\boldsymbol{\theta})$ for parameters whose
-% objective lies in the top~$\gamma$ quantile,
-% and $q_{\text{bad}}(\boldsymbol{\theta})$ for the rest.
-% New trials are drawn to maximise the ratio
-% $q_{\text{good}}/q_{\text{bad}}$, an approximation of expected
-% improvement that \emph{does not assume homoscedastic noise}.
-% This is a natural match for our CVaR objective:
-% heteroscedastic shot noise is already damped by the CVaR tail
-% (Eq.\,\ref{eq:variance}), and TPE further biases sampling toward
-% regions where the \emph{distribution} of costs—not just the mean—is
-% promising.
-% We report results for both the Optuna defaults
-% (prior\_weight = 1.0, 24 EI candidates) and an ``aggressive’’ variant
-% (prior\_weight = 0.5, 64 candidates) that emphasises exploitation.
-
-
-% \subsection{Genetic Algorithm Baseline}
-
-% PyGAD with chromosome length 130 bits uses:
-% roulette-wheel selection, two-point crossover,
-% adaptive mutation \((p_{\text{high}},p_{\text{low}})=(0.06,0.012)\),
-% population size $5\times$ chromosome length
-% and enough generations to match the VQE’s
-% \(10^{5}\) oracle-call budget.
-% This configuration emerged as the best among several quick sweeps; a
-% detailed GA hyper-study is left to future work.
-
-% \subsection{Default Hyper-parameters}
-
-% \begin{table}[H]
-% \centering
-% \begin{tabular}{lcc}
-% \toprule
-% Parameter & Symbol & Value \\
-% \midrule
-% Battery capacity & $B_{\max}$ & 80 \\
-% Payload capacity & $Q_{\max}$ & 50 \\
-% Selected routes & $k$ & 10 \\
-% Circuit shots & $N_{\text{shots}}$ & 4\,096 \\
-% MC samples & $N_{\text{mc}}$ & 2\,000 \\
-% CVaR tail & $\alpha$ & 0.05 \\
-% Ansatz layers & $L$ & 1–2 \\
-% Oracle budget / trial &  & $10^{5}$ \\
-% \bottomrule
-% \end{tabular}
-% \caption{Default hyper-parameters shared across all experiments.}
-% \end{table}
-
-
-
-\section{Methods}\label{sec:methods}
-
-\subsection{Graph and Route Pool Generation}\label{sec:graph}
-
-We model the drone routing problem on a sparse undirected graph \(G=(V,E)\), where node \(0\) represents the depot. Nodes and edges are derived from a Delaunay triangulation of customer node coordinates, augmented by direct edges from the depot to each customer node, creating a realistic sparse "star-plus-local" topology. Edges store travel time, battery usage, and regulatory no-fly flags. Feasibility constraints such as battery capacity \(B_{\max}\) and payload \(Q_{\max}\) are fully handled classically by a greedy soft-max heuristic (\(S=6\)), which pre-generates a pool of \(N=2\,048\) feasible routes. Thus, our quantum optimisation is purely combinational, focused solely on subset selection. Full pseudocode details appear in Appendix~\ref{app:algorithms}.
-
-\subsection{Subset-Route Formulation and 13-Qubit Encoding}
-
-The quantum problem reduces to selecting exactly \(k=10\) route–wave pairs from the fixed pool of \(N=2\,048\) routes and assigning each route to one of \(M=4\) launch waves, allowing multiple flights per drone. The combinational search space is therefore
-\[
-{2\,048 \choose 10}\times4^{10}\approx3.6\times10^{32}.
-\]
-We represent each route-wave pair using a compact logarithmic indexing:
-\[
-r=\left(\sum_{j=0}^{n_r-1}2^{j} z_j\right)\!\bmod N,\quad
-w=\left(\sum_{j=0}^{n_w-1}2^{j} z_{n_r+j}\right)\!\bmod M,
-\]
-with \(n_r=\lceil\log_2 N\rceil=11\), and \(n_w=\lceil\log_2 M\rceil=2\), totaling only \(13\) qubits. Compared to existing minimal-qubit schemes~\cite{davies_quantum_2024,leonidas_qubit_2023}, our approach avoids exponential variable blow-up by shifting constraints entirely to classical preprocessing. Duplicate route handling and scheduling details are provided in Appendix~\ref{app:algorithms}.
-
-\subsection{Black-Box Cost Oracle and CVaR Objective}\label{sec:cost}
-
-Given a candidate subset \(\mathcal{S}\), our cost oracle computes:
-\[
-C(\mathcal{S}) = 
-10\,T_{\max} + 
-\lambda_E\!\sum_{(u,v)\in E_c}(1-\mathbbm{1}_{uv})^{2} +
-\lambda_V\!\sum_{v>0}(1-\mathbbm{1}_{v})^{2} +
-\lambda_0\!\sum_{v>0}\mathbbm{1}_{v}^{\mathrm{miss}} +
-\lambda_W\,(\text{overbook})^{2},
-\]
-with empirically chosen weights (\(\lambda_0=50\lambda_V\)) ensuring 100\% node coverage in all solutions.
-
-To handle inherent stochasticity in quantum sampling, we adopt the Conditional-Value-at-Risk (CVaR) metric from the CVaR-VQE framework~\cite{barkoutsos2020cvar}, selecting only the mean of the lowest-cost $\alpha$-fraction of Monte-Carlo (MC) samples:
-\[
-J_{\alpha}(c)=\frac{1}{\alpha K}\sum_{i=1}^{\alpha K} c_{(i)},\quad c_{(i)}\le c_{(i+1)}.
-\]
-
-\subsection{Noise-Aware CVaR Objective and Bayesian Optimisation}
-
-Unlike traditional QUBO-based quantum formulations, our compressed-qubit VQE explicitly relies on finite quantum measurements and Monte-Carlo (MC) sampling, rather than analytic cost evaluation from a statevector. Given the measured probability mass \(\{p_i\}\) over the 13-qubit index register (encoding both routes and launch waves), we draw \(N_{\mathrm{mc}}=2\,000\) candidate subsets and obtain a vector of sampled costs \(\boldsymbol{c}\). Our optimisation objective is the Conditional-Value-at-Risk (CVaR) metric, which explicitly averages the lowest-cost \(\alpha\)-fraction of these MC samples, as proposed in the CVaR-VQE framework of Barkoutsos et al.~\cite{barkoutsos_improving_2020}:
 \begin{equation}
-   J_{\alpha}(\boldsymbol{c})=\frac{1}{\alpha K}\sum_{i=1}^{\alpha K} c_{(i)},\quad c_{(1)}\leq c_{(2)}\leq\dots
+r = \left(\sum_{j=0}^{n_r-1} 2^{j} z_j\right) \bmod N, \quad 
+w = \left(\sum_{j=0}^{n_w-1} 2^{j} z_{n_r+j}\right) \bmod M
+\label{eq:encoding}
 \end{equation}
 
+Here, $n_r=11$ qubits encode route indices, and $n_w=2$ qubits encode wave assignments. This compressed encoding dramatically outperforms standard QUBO formulations, typically requiring hundreds of qubits for similar scenarios.
 
-The variance of this CVaR estimator is significantly impacted by the MC sampling step:
+\subsection{Cost Oracle and Risk-Aware Optimization}
+
+Robust decision-making under uncertainty requires a cost evaluation scheme sensitive to worst-case outcomes. Our cost oracle combines makespan minimization with penalty terms for operational constraint violations:
+
 \begin{equation}
-    \mathrm{Var}[J_{\alpha}] =
-\underbrace{\frac{\sigma_C^{2}}{N_{\mathrm{mc}}}}_{\text{MC sampling noise}}
-+ \underbrace{\sum_{i}\frac{p_i(1-p_i)}{N_{\text{shots}}}\left(C_i^{\text{tail}}\right)^2}_{\text{shot noise}}
+\begin{split}
+C(\mathcal{S}) &= 10 T_{\max} + \lambda_E \sum_{(u,v)\in E_c} (1-\mathbb{1}_{uv})^2 + \lambda_V \sum_{v>0}(1-\mathbb{1}_v)^2 \\
+&\quad + \lambda_0 \sum_{v>0}\mathbb{1}_v^{\text{miss}} + \lambda_W (\text{overbook})^2
+\end{split}
+\label{eq:cost}
 \end{equation}
 
+In this formulation, $\mathbb{1}_{uv}$ indicates whether an edge $(u,v)$ is traversed, and $\mathbb{1}_v$ indicates node coverage. Penalty terms strongly discourage constraint violations, ensuring robust solutions.
 
-Here, the MC sampling noise dominates, due to combining individually strong bit-strings into possibly poor overall solutions. Conversely, shot noise (\(\propto p_i(1-p_i)\)) is negligible at \(N_{\text{shots}}=4,096\). By selecting only the lowest \(\alpha=0.05\) fraction of costs, CVaR acts as a noise filter—trimming away samples with inflated variance and high cost—resulting in a smoother, tail-focused cost landscape beneficial for optimisation.
+We minimize the Conditional Value-at-Risk (CVaR) to handle the inherent stochasticity in quantum sampling:
 
-\paragraph{Why Bayesian optimisation with TPE?}
-Since the CVaR objective is inherently defined via finite-sampling, it is piecewise-constant, non-differentiable, and heteroscedastic—properties poorly suited to gradient-based or Gaussian-process optimisation methods. We therefore employ Bayesian optimisation via the Tree-Parzen Estimator (TPE) implemented by Optuna~\cite{akiba_optuna_2019}. TPE replaces Gaussian-process surrogate models with two non-parametric density estimates: \(q_{\text{good}}(\boldsymbol{\theta})\) for parameters performing in the top quantile, and \(q_{\text{bad}}(\boldsymbol{\theta})\) otherwise. New parameter sets are selected to maximise the expected improvement approximated by the ratio:
-\[
-\boldsymbol{\theta}_{\text{next}} = \arg\max_{\boldsymbol{\theta}} \frac{q_{\text{good}}(\boldsymbol{\theta})}{q_{\text{bad}}(\boldsymbol{\theta})}.
-\]
+\begin{equation}
+J_{\alpha}(\mathbf{c}) = \frac{1}{\alpha K}\sum_{i=1}^{\alpha K} c_{(i)}
+\label{eq:cvar}
+\end{equation}
 
-Crucially, TPE does not assume homoscedastic or Gaussian noise. Thus, it naturally exploits the variance reduction provided by CVaR's tail truncation—effectively steering parameter exploration toward regions where cost distributions (not just mean values) are robustly favorable. We evaluate two TPE configurations: the default (prior\_weight=1.0, 24 EI candidates) and an aggressive variant (prior\_weight=0.5, 64 EI candidates), balancing exploration versus exploitation efficiency.
+This tail-average focuses the optimizer on worst-case performance, filtering out high-variance samples that could mislead gradient-free search.
 
-Full pseudocode, hyperparameter values, and further analytical derivations of variance are provided in Appendices~\ref{app:algorithms} and~\ref{app:variance}.
+\subsection{Bayesian Hyperparameter Optimization}
+
+The inherently noisy and non-differentiable quantum optimization landscape necessitates specialized optimization strategies. We employ Optuna's Tree-Parzen Estimator (TPE), which explicitly models performance distributions by fitting separate density estimates for high-performing and low-performing regions. New trial parameters are chosen to maximize expected improvement, efficiently handling heteroscedastic and non-convex cost surfaces. Two TPE configurations---Default and Aggressive---are systematically evaluated, with median-based early stopping criteria to manage computational costs.
+
+\subsection{Classical Benchmarking}
+
+Rigorous evaluation of quantum solutions necessitates benchmarking against well-established classical optimization methods. We adopt a Genetic Algorithm baseline using bit-string encoding, roulette-wheel selection with elitism, adaptive mutation probabilities (high: 0.06, low: 0.012), and two-point crossover. Computational budgets are strictly matched between classical and quantum methods to ensure fair comparisons, with comprehensive tuning results documented in Appendix~\ref{app:algorithms}.
+
+\subsection{Experimental Configuration}
+
+Table~\ref{tab:hyperparams} provides a comprehensive overview of the hyperparameters and configurations used across experiments. Quantum optimization employs a hardware-efficient variational ansatz consisting of $L \in \{1,2\}$ layers, with $N_{\text{shots}}=4096$ circuit evaluations and $N_{\text{mc}}=2000$ Monte Carlo samples for robust cost estimation.
+
+This structured methodological framework systematically reduces quantum optimization complexity while maintaining robust solution quality, demonstrating a viable path toward practical quantum advantage in realistic drone logistics applications.
 
 
-\subsection{Classical Benchmark (Genetic Algorithm)}
+\subsection{Default Hyper-parameters}
 
-Our classical baseline is a tuned Genetic Algorithm (PyGAD), matching the quantum setup with chromosome length \(130\) bits, roulette-wheel selection, two-point crossover, adaptive mutation (high=0.06, low=0.012), and population size five times chromosome length. Generations are calibrated to ensure an identical computational budget (\(10^5\) evaluations) to our quantum solver, ensuring fair benchmarking. Further GA parameter tuning is discussed in Appendix~\ref{app:algorithms}.
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+Parameter & Symbol & Value \\
+\midrule
+Battery capacity & $B_{\max}$ & 80 \\
+Payload capacity & $Q_{\max}$ & 50 \\
+Selected routes & $k$ & 10 \\
+Circuit shots & $N_{\text{shots}}$ & 4\,096 \\
+MC samples & $N_{\text{mc}}$ & 2\,000 \\
+CVaR tail & $\alpha$ & 0.05 \\
+Ansatz layers & $L$ & 1–2 \\
+Oracle budget / trial &  & $10^{5}$ \\
+\bottomrule
+\end{tabular}
+\caption{Default hyper-parameters shared across all experiments.}
+\end{table}
