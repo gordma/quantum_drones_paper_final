@@ -40,10 +40,10 @@ Before evaluating quantum performance, we establish the performance ceiling of c
 
 \begin{figure}[htb]
     \centering
-    % TODO: Insert ga_mutation_sweep.png with robust band emphasis
+    \includegraphics[width=0.8\linewidth]{figures/01_ga_mutation_sweep.png}
     \caption{Classical optimization baseline establishment. Mutation probabilities $\mu \in [0.20, 0.25]$ (blue shaded band) yield the lowest \emph{average} cost and smallest variance, confirming that moderately high mutation rates represent the robust sweet-spot. Lower $\mu$ risks premature convergence, while excessively high $\mu > 0.25$ never outperforms the shaded region. The classical performance ceiling of 7\,790 establishes the benchmark quantum methods must surpass.}
     \label{fig:ga_mutation}
-\end{figure}
+\end{figure>
 
 Systematic analysis across mutation rates $\mu \in \{0.15, 0.18, 0.20, 0.22, 0.25\}$ reveals the robust high-mutation band:
 \begin{itemize}[nosep]
