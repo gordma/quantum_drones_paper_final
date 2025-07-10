@@ -59,6 +59,7 @@ This result aligns with CVaR theory: since we focus on the lowest 5\% of cost
 samples, aggressive exploitation of promising parameter regions becomes more 
 valuable than broad exploration.
 
+
 \subsection{CVaR Risk Parameter Optimization}
 
 The tail-focused $\alpha=0.05$ setting outperforms the broader $\alpha=0.10$ 
@@ -74,10 +75,12 @@ The $\alpha=0.05$ sweet spot likely reflects the balance between noise filtering
 for optimization). Smaller $\alpha$ values risk over-truncation, while larger 
 values dilute the risk-aware advantage.
 
+
 \subsection{Circuit Depth Analysis}
 
 Doubling circuit depth ($L=2$) provides no measurable benefit while increasing 
 gate count.
+
 
 Configuration Q4 ($L=2$, 52~parameters) achieves $\langle C\rangle=8{,}040\pm120$—statistically 
 equivalent to the shallow Q1~result despite 26~additional trainable angles. 
@@ -133,6 +136,7 @@ due to our greedy duplicate-removal heuristic. This affects both methods equally
 preserving fair comparison. Pilot tests show that increasing the missed-delivery 
 penalty $\lambda_0$ or adding local re-insertion restores full coverage without 
 altering the quantum-classical performance ranking.
+
 
 \subsection{Practical Deployment Considerations}
 

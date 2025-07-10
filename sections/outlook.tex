@@ -12,20 +12,20 @@ and CVaR-TPE synergy together yield a \textbf{6–8\,\%} mean-cost edge
 that survives realistic \texttt{ibm\_fez} noise.
 
 \paragraph{Limitations.}
-\begin{enumerate}[nosep,leftmargin=*]
-\item \textbf{Single instance.}  We benchmark on one 30–40-node graph.
-      Although it is industry-derived, multi-instance validation
-      (including dynamic or larger fleets) is future work.
-\item \textbf{Route pool fixed \emph{a priori}.}
-      The classical soft-max generator is outside the quantum loop.
-      Hybrid schemes that \emph{co-evolve} the pool (e.g.\ column
-      generation) remain unexplored.
-\item \textbf{Baseline scope.}  GA is a strong black-box competitor,
-      but other meta-heuristics (ALNS, simulated annealing, branch-and-price
-      with tailored pricing) could be added to the comparison set.
-\item \textbf{Noise model.}  We simulated calibrated noise rather than
-      executing on hardware.  Real runs will add queue latency,
-      calibration drift and SWAP overheads.
+\begin{enumerate}
+    \item \textbf{Single instance.}  We benchmark on one 30–40-node graph.
+          Although it is industry-derived, multi-instance validation
+          (including dynamic or larger fleets) is future work.
+    \item \textbf{Route pool fixed \emph{a priori}.}
+          The classical soft-max generator is outside the quantum loop.
+          Hybrid schemes that \emph{co-evolve} the pool (e.g.\ column
+          generation) remain unexplored.
+    \item \textbf{Baseline scope.}  GA is a strong black-box competitor,
+          but other meta-heuristics (ALNS, simulated annealing, branch-and-price
+          with tailored pricing) could be added to the comparison set.
+    \item \textbf{Noise model.}  We simulated calibrated noise rather than
+          executing on hardware.  Real runs will add queue latency,
+          calibration drift and SWAP overheads.
 \end{enumerate}
 
 \paragraph{Near-term extensions.}
