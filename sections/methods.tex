@@ -306,7 +306,7 @@
 % \caption{Default hyper-parameters shared across all experiments.}
 % \end{table}
 
-\usepackage{bbm}
+
 
 \section{Methods}\label{sec:methods}
 
@@ -340,7 +340,7 @@ C(\mathcal{S}) =
 \]
 with empirically chosen weights (\(\lambda_0=50\lambda_V\)) ensuring 100\% node coverage in all solutions.
 
-To handle inherent stochasticity in quantum sampling, we adopt the Conditional-Value-at-Risk (CVaR) metric from the CVaR-VQE framework~\cite{barkoutsos2020cvar}, selecting only the mean of the lowest-cost α-fraction of Monte-Carlo (MC) samples:
+To handle inherent stochasticity in quantum sampling, we adopt the Conditional-Value-at-Risk (CVaR) metric from the CVaR-VQE framework~\cite{barkoutsos2020cvar}, selecting only the mean of the lowest-cost $\alpha$-fraction of Monte-Carlo (MC) samples:
 \[
 J_{\alpha}(c)=\frac{1}{\alpha K}\sum_{i=1}^{\alpha K} c_{(i)},\quad c_{(i)}\le c_{(i+1)}.
 \]
