@@ -9,8 +9,8 @@ of quantum-assisted drone routing.
 The 13-qubit quantum solver achieves a 6.4\% cost reduction with statistical 
 significance over the tuned GA baseline.
 
-Figure~\ref{fig:budget400k} shows optimization progress under the Standard budget 
-(400k oracles). After 200 iterations, CVaR-VQE (Q1 configuration) converges to 
+Figure~\ref{fig:learning_curves} shows optimization progress under an equal
+2~million-oracle budget. CVaR-VQE (Q1 configuration) converges to 
 $\langle C\rangle=8{,}030\pm110$, substantially outperforming the best GA result 
 of $8{,}493\pm420$. A one-sided Welch test confirms statistical significance 
 ($p<0.001$), establishing a robust quantum advantage despite the compressed 
@@ -18,10 +18,10 @@ of $8{,}493\pm420$. A one-sided Welch test confirms statistical significance
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=.7\linewidth]{fig/budget400k_progress.pdf}
-  \caption{Convergence trajectories on the Standard 400k-oracle budget. 
+  \includegraphics[width=.7\linewidth]{fig/learning_curves_comparison.pdf}
+  \caption{Convergence trajectories on the 2~million-oracle budget. 
            Shaded bands show $\pm1$ standard deviation over 30 independent trials.}
-  \label{fig:budget400k}
+  \label{fig:learning_curves}
 \end{figure}
 
 The quantum method also demonstrates superior consistency, with standard deviation 
@@ -109,6 +109,29 @@ noise narrows the performance gap, it does not reverse the quantum-classical ran
 This robustness stems from CVaR's implicit noise filtering—by averaging only 
 the best-performing samples, the metric naturally dampens the impact of 
 noise-corrupted outliers.
+
+\subsection{Noise-assisted Early Convergence}
+
+While final costs remain essentially unchanged, device noise can 
+accelerate convergence. Figure~\ref{fig:learning_curves_noise} overlays 
+mean best–so–far trajectories for the same configuration with and without 
+the calibrated \texttt{ibm\_fez} noise model (\(L=2,\,\alpha=0.05\)). The 
+noisy run reaches a plateau within \textasciitilde{}\,31 objective evaluations, whereas the noiseless 
+run requires \textasciitilde{}\,74 evaluations to come within 2\,\% of its final cost—a 
+2.4\,\times speed-up. Appendix~Fig.~S1 quantifies this effect across individual 
+trials.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.7\linewidth]{fig/learning_curves_noise.pdf}
+  \caption{Mean best–so–far cost versus objective evaluations for the same
+           CVaR-VQE configuration under noiseless (blue) and noisy (red) execution.
+           Shaded bands indicate $\pm1\,\sigma$ (30 noiseless, 10 noisy trials).
+           Horizontal grid lines are 100-cost increments; the bracket highlights
+           the 31 vs 74 evaluation counts required to reach 102\,\% of the final
+           cost.}
+  \label{fig:learning_curves_noise}
+\end{figure}
 
 \subsection{Budget Scaling Analysis}
 
