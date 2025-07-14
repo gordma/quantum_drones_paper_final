@@ -37,12 +37,9 @@ We employ Optuna's Aggressive TPE sampler configured with \texttt{prior\_weight 
 
 \subsection{Evaluation Protocol}
 
-\subsubsection{Budget Fairness}
+\textit{Budget Fairness}
 All methods receive identical computational budgets of 200,000 objective function evaluations. The noiseless VQE configuration uses 200 iterations with 1,000 samples at 10,000 shots each, while the noisy VQE employs 100 iterations with 1,000 samples at 10,000 shots each. The GA baseline operates with 2,000 population size across 100 iterations. This allocation represents a small fraction of the $O(10^{26})$ search space while ensuring fair comparison across all methods.
 
-\subsubsection{Statistical Rigor}
-Each configuration undergoes 30 independent trials with different random seeds to ensure statistical significance. We report both best-case performance and mean $\pm$ standard deviation across trials to provide comprehensive performance assessment.
+\textit{Trial size} Each configuration undergoes 30 independent trials with different random seeds to ensure statistical significance. We report both best-case performance and mean $\pm$ standard deviation across trials to provide comprehensive performance assessment.
 
-\subsection{Noise Modeling}
-
-To validate practical deployability, we evaluate performance under realistic quantum noise using IBM's calibrated \texttt{ibm\_fez} noise model. The study comprehensively covers circuit depths $L \in \{1, 2\}$, risk parameters $\alpha \in \{0.05, 0.1, 1.0\}$, optimizer comparisons between Aggressive-TPE, Default-TPE, and Random sampling, with 30 trials per configuration ensuring robust statistical analysis. Noiseless baselines use identical hyperparameters, enabling direct measurement of noise-induced performance degradation.
+\textit{Noise Modeling} To validate practical deployability, we evaluate performance under realistic quantum noise using IBM's calibrated \texttt{ibm\_fez} noise model. The study comprehensively covers circuit depths $L \in \{1, 2\}$, risk parameters $\alpha \in \{0.05, 0.1, 1.0\}$, optimizer comparisons between Aggressive-TPE, Default-TPE, and Random sampling, with 30 trials per configuration ensuring robust statistical analysis. Noiseless baselines use identical hyperparameters, enabling direct measurement of noise-induced performance degradation.
