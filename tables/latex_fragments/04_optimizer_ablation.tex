@@ -1,0 +1,15 @@
+\begin{table}[htb]
+    \centering
+    \caption{Optimizer ablation study comparing Bayesian optimization strategies. All VQE variants outperform the tuned GA baseline, confirming that quantum advantage is not merely due to superior hyperparameter optimization. Results from preliminary experiments with budget variations.}
+    \label{tab:optimizer_ablation}
+    \begin{tabular}{lcccr}
+        \toprule
+        Method & Optimizer & Best Cost & Mean $\pm$ Std & vs GA \\
+        \midrule
+        GA ($\mu^* = 0.22$) & Genetic Algorithm & 7,770 & 8,533 $\pm$ 375 & — \\
+        CVaR-VQE aggressive tpe & Aggressive-Tpe & 7,290 & 7,905 $\pm$ 325 & \textbf{-7.4\%} \\
+        CVaR-VQE default tpe & Default-Tpe & 7,330 & 7,985 $\pm$ 250 & \textbf{-6.4\%} \\
+        CVaR-VQE random & Random & 7,330 & 8,058 $\pm$ 300 & \textbf{-5.6\%} \\
+        \bottomrule
+    \end{tabular}
+\end{table}

@@ -1,0 +1,28 @@
+\begin{table}[htb]
+    \centering
+    \caption{Noise robustness analysis under IBM \texttt{ibm\_fez} calibrated noise model. Quantum advantage persists despite realistic hardware noise, with modest performance degradation.}
+    \label{tab:noise_robustness}
+    \begin{tabular}{lcccr}
+        \toprule
+        Configuration & Condition & Best & Mean $\pm$ Std & Degradation \\
+        \midrule
+        L=1.0, α=0.05 & Noiseless & 6,790 & 7,638 $\pm$ 335 & — \\
+        L=1.0, α=0.05 & Noisy & 7,290 & 7,944 $\pm$ 378 & +4.0\% \\
+        \addlinespace
+        L=1.0, α=0.10 & Noiseless & 7,260 & 7,776 $\pm$ 323 & — \\
+        L=1.0, α=0.10 & Noisy & 6,820 & 7,943 $\pm$ 367 & +2.1\% \\
+        \addlinespace
+        L=1.0, α=1.00 & Noiseless & 7,280 & 7,819 $\pm$ 331 & — \\
+        L=1.0, α=1.00 & Noisy & 7,300 & 8,038 $\pm$ 299 & +2.8\% \\
+        \addlinespace
+        L=2.0, α=0.05 & Noiseless & 6,830 & 7,778 $\pm$ 281 & — \\
+        L=2.0, α=0.05 & Noisy & 7,370 & 7,975 $\pm$ 252 & +2.5\% \\
+        \addlinespace
+        L=2.0, α=0.10 & Noiseless & 6,820 & 7,784 $\pm$ 343 & — \\
+        L=2.0, α=0.10 & Noisy & 7,780 & 8,056 $\pm$ 278 & +3.5\% \\
+        \addlinespace
+        L=2.0, α=1.00 & Noiseless & 7,300 & 7,917 $\pm$ 270 & — \\
+        L=2.0, α=1.00 & Noisy & 7,760 & 8,080 $\pm$ 240 & +2.1\% \\
+        \bottomrule
+    \end{tabular}
+\end{table}

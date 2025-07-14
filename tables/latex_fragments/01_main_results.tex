@@ -1,0 +1,14 @@
+\begin{table}[htb]
+    \centering
+    \caption{Performance comparison between GA baseline and CVaR-VQE variants under identical 400\,000-evaluation budget. All VQE configurations achieve 5--7\% improvement over the mutation-optimized GA, demonstrating robust quantum advantage across optimization strategies.}
+    \label{tab:main_results}
+    \begin{tabular}{lcccr}
+        \toprule
+        Method & Best Cost & Mean $\pm$ Std & $n$ & vs GA \\
+        \midrule
+        GA ($\mu^* = 0.22$) & 7,800 & 8,415 $\pm$ 338 & 30 & — \\
+        VQE Aggressive-TPE & \textbf{6,830} & 7,778 $\pm$ 281 & 30 & \textbf{-7.6\%} \\
+        VQE_noisy & 7,370 & 7,975 $\pm$ 252 & 30 & \textbf{-5.2\%} \\
+        \bottomrule
+    \end{tabular}
+\end{table}

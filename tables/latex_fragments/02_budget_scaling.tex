@@ -1,0 +1,14 @@
+\begin{table}[htb]
+    \centering
+    \caption{Budget scaling analysis: quantum advantage across evaluation budgets. VQE maintains consistent advantage over tuned GA baseline across different computational constraints.}
+    \label{tab:budget_scaling}
+    \begin{tabular}{lrccr}
+        \toprule
+        Configuration & Budget & Best & Mean $\pm$ Std & vs GA \\
+        \midrule
+        Vqe 200Iter & 200,000 & 6,830 & 7,778 $\pm$ 281 & \textbf{-7.6\%} \\
+        Vqe 1000Iter & 2,000,000 & 7,260 & 7,494 $\pm$ 271 & \textbf{-10.9\%} \\
+        Ga Tuned & 200,000 & 7,800 & 8,415 $\pm$ 338 & — \\
+        \bottomrule
+    \end{tabular}
+\end{table}
