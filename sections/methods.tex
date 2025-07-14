@@ -1,6 +1,4 @@
-\section{Methods}
-
-\subsection{Problem Definition: Subset‑Route Drone VRP}
+\section{Problem Definition: Subset‑Route Drone VRP}
 \label{sec:problem}
 
 Let $G=(V,E)$ be an undirected graph with depot node $0$ and
@@ -46,7 +44,7 @@ ${\small\binom{\Nroutes}{k} M^{k}}$, motivating a logarithmic
 $\lceil\log_2\Nroutes\rceil+\lceil\log_2 M\rceil$‑qubit encoding for
 quantum optimisation.
 
-
+\section{Methods}
 \subsection{Solution Overview}
 
 To avoid exponential qubit scaling, we split the drone routing problem into two stages. We first filter thousands of constraint-violating routes classically, then apply quantum optimization to select the best feasible subset. This hybrid approach reduces a 275-qubit QUBO problem to just 13 qubits while preserving solution quality.
