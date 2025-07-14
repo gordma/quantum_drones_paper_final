@@ -106,7 +106,7 @@ mean best–so–far trajectories for the same configuration with and without
 the calibrated \texttt{ibm\_fez} noise model (\(L=2,\,\alpha=0.05\)). The 
 noisy run reaches a plateau within \textasciitilde{}\,31 objective evaluations, whereas the noiseless 
 run requires \textasciitilde{}\,74 evaluations to come within 2\,\% of its final cost—a 
-2.4\,\times speed-up. Appendix~Fig.~S1 quantifies this effect across individual 
+2.4$\,\times$ speed-up. Appendix~Fig.~S1 quantifies this effect across individual 
 trials.
 
 \begin{figure}[h]
@@ -114,10 +114,8 @@ trials.
   \includegraphics[width=.7\linewidth]{fig/learning_curves_noise.pdf}
   \caption{Mean best–so–far cost versus objective evaluations for the same
            CVaR-VQE configuration under noiseless (blue) and noisy (red) execution.
-           Shaded bands indicate $\pm1\,\sigma$ (30 noiseless, 10 noisy trials).
-           Horizontal grid lines are 100-cost increments; the bracket highlights
-           the 31 vs 74 evaluation counts required to reach 102\,% of the final
-           cost. Note: The x-axis begins at 2,000 evaluations because the GA baseline operates in batches of 2,000; no meaningful value is defined at zero.}
+           Shaded bands indicate $\pm1\,\sigma$ (n=30 trials).
+           Note: The x-axis begins at 2,000 evaluations because the GA baseline operates in batches of 2,000; no meaningful value is defined at zero.}
   \label{fig:learning_curves_noise}
 \end{figure}
 
