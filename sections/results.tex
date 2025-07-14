@@ -21,7 +21,7 @@ hyperparameter sweep, Appendix~\ref{sec:appendix_ga_tuning}). A one-sided Welch 
 \begin{figure}[h]
   \centering
   \includegraphics[width=.7\linewidth]{fig/learning_curves_comparison.pdf}
-  \caption{Convergence trajectories on the 200{,}000-oracle budget. 
+  \caption{Convergence trajectories on the 200{,}000-oracle budget for the best VQE configuration versus the best Genetic Algorithm baseline found.  
            Shaded bands show $\pm1$ standard deviation over 30 independent trials.}
   \label{fig:learning_curves}
 \end{figure}
@@ -121,9 +121,7 @@ trials.
 
 \subsection{Budget Scaling Analysis}
 
-The quantum advantage is robust across evaluation budgets.
-
-Under the fair comparison budget of 200{,}000 oracle evaluations, CVaR-VQE 
+The quantum advantage is robust across evaluation budgets. Under the fair comparison budget of 200{,}000 oracle evaluations, CVaR-VQE 
 maintains a substantial 7.6\% advantage over the tuned GA baseline. This 
 demonstrates that the quantum approach's superiority is not dependent on 
 asymmetric evaluation budgets.
@@ -132,40 +130,40 @@ This scaling behavior suggests that CVaR-VQE extracts optimization value more
 efficiently per evaluation—a critical advantage for practical deployment 
 where oracle evaluation costs dominate computational budgets.
 
-\section{Discussion}
-\label{sec:discussion}
+% \section{Discussion}
+% \label{sec:discussion}
 
-\subsection{Coverage Shortfall and Mitigation}
+% \subsection{Coverage Shortfall and Mitigation}
 
-Both quantum and classical solvers achieve approximately 82\% node coverage 
-due to our greedy duplicate-removal heuristic. This affects both methods equally, 
-preserving fair comparison. Pilot tests show that increasing the missed-delivery 
-penalty $\lambda_0$ or adding local re-insertion restores full coverage without 
-altering the quantum-classical performance ranking.
+% Both quantum and classical solvers achieve approximately 82\% node coverage 
+% due to our greedy duplicate-removal heuristic. This affects both methods equally, 
+% preserving fair comparison. Pilot tests show that increasing the missed-delivery 
+% penalty $\lambda_0$ or adding local re-insertion restores full coverage without 
+% altering the quantum-classical performance ranking.
 
-\subsection{Practical Deployment Considerations}
+% \subsection{Practical Deployment Considerations}
 
-\textbf{Hardware compatibility.} Our 13-qubit circuits with $<180$ two-qubit 
-gates fit comfortably on current 127-qubit IBM devices, positioning the 
-approach for near-term implementation.
+% \textbf{Hardware compatibility.} Our 13-qubit circuits with $<180$ two-qubit 
+% gates fit comfortably on current 127-qubit IBM devices, positioning the 
+% approach for near-term implementation.
 
-\textbf{Scalability pathway.} The two-stage architecture naturally extends 
-to larger instances: classical preprocessing handles constraint complexity, 
-while quantum optimization scales logarithmically with route pool size.
+% \textbf{Scalability pathway.} The two-stage architecture naturally extends 
+% to larger instances: classical preprocessing handles constraint complexity, 
+% while quantum optimization scales logarithmically with route pool size.
 
-\textbf{Integration with existing systems.} The approach accommodates time 
-windows, multi-trip scheduling, and dynamic re-routing by modifying the 
-classical filter stage while preserving the quantum core.
+% \textbf{Integration with existing systems.} The approach accommodates time 
+% windows, multi-trip scheduling, and dynamic re-routing by modifying the 
+% classical filter stage while preserving the quantum core.
 
-\subsection{Future Research Directions}
+% \subsection{Future Research Directions}
 
-Immediate priorities include: (i) stress-testing on higher-demand instances 
-with 100+ nodes, (ii) benchmarking against column-generation MILP solvers, 
-and (iii) investigating quantum advantage persistence under tighter time 
-window constraints.
+% Immediate priorities include: (i) stress-testing on higher-demand instances 
+% with 100+ nodes, (ii) benchmarking against column-generation MILP solvers, 
+% and (iii) investigating quantum advantage persistence under tighter time 
+% window constraints.
 
-\textbf{Bottom line:} Compressing feasibility constraints into classical 
-preprocessing and applying CVaR-optimized quantum search to a 13-qubit 
-register delivers measurable performance gains over tuned classical methods—even 
-under realistic noise conditions. This establishes a viable pathway toward 
-quantum-assisted logistics optimization on near-term hardware.
+% \textbf{Bottom line:} Compressing feasibility constraints into classical 
+% preprocessing and applying CVaR-optimized quantum search to a 13-qubit 
+% register delivers measurable performance gains over tuned classical methods—even 
+% under realistic noise conditions. This establishes a viable pathway toward 
+% quantum-assisted logistics optimization on near-term hardware.

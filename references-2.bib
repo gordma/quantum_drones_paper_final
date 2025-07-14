@@ -45,3 +45,81 @@
     year = {2025},
     pages = {476},
 }
+@article{cerezo_cost_2021,
+    title = {Cost function dependent barren plateaus in shallow parametrized quantum circuits},
+    volume = {12},
+    issn = {2041-1723},
+    url = {https://www.nature.com/articles/s41467-021-21728-w},
+    doi = {10.1038/s41467-021-21728-w},
+    abstract = {Abstract
+              Variational quantum algorithms (VQAs) optimize the parameters
+              θ
+              of a parametrized quantum circuit
+              V
+              (
+              θ
+              ) to minimize a cost function
+              C
+              . While VQAs may enable practical applications of noisy quantum computers, they are nevertheless heuristic methods with unproven scaling. Here, we rigorously prove two results, assuming
+              V
+              (
+              θ
+              ) is an alternating layered ansatz composed of blocks forming local 2-designs. Our first result states that defining
+              C
+              in terms of global observables leads to exponentially vanishing gradients (i.e., barren plateaus) even when
+              V
+              (
+              θ
+              ) is shallow. Hence, several VQAs in the literature must revise their proposed costs. On the other hand, our second result states that defining
+              C
+              with local observables leads to at worst a polynomially vanishing gradient, so long as the depth of
+              V
+              (
+              θ
+              ) is
+                  \$\$\{{\textbackslash}mathcal\{O\}\}({\textbackslash}mathrm\{log\}{\textbackslash},n)\$\$
+                    O
+                      (
+                        log
+                        n
+                      )
+              . Our results establish a connection between locality and trainability. We illustrate these ideas with large-scale simulations, up to 100 qubits, of a quantum autoencoder implementation.},
+    language = {en},
+    number = {1},
+    urldate = {2025-06-08},
+    journal = {Nature Communications},
+    author = {Cerezo, M. and Sone, Akira and Volkoff, Tyler and Cincio, Lukasz and Coles, Patrick J.},
+    month = mar,
+    year = {2021},
+    pages = {1791},
+}
+@article{mcclean_barren_2018,
+    title = {Barren plateaus in quantum neural network training landscapes},
+    volume = {9},
+    issn = {2041-1723},
+    url = {https://www.nature.com/articles/s41467-018-07090-4},
+    doi = {10.1038/s41467-018-07090-4},
+    abstract = {Abstract
+            Many experimental proposals for noisy intermediate scale quantum devices involve training a parameterized quantum circuit with a classical optimization loop. Such hybrid quantum-classical algorithms are popular for applications in quantum simulation, optimization, and machine learning. Due to its simplicity and hardware efficiency, random circuits are often proposed as initial guesses for exploring the space of quantum states. We show that the exponential dimension of Hilbert space and the gradient estimation complexity make this choice unsuitable for hybrid quantum-classical algorithms run on more than a few qubits. Specifically, we show that for a wide class of reasonable parameterized quantum circuits, the probability that the gradient along any reasonable direction is non-zero to some fixed precision is exponentially small as a function of the number of qubits. We argue that this is related to the 2-design characteristic of random circuits, and that solutions to this problem must be studied.},
+    language = {en},
+    number = {1},
+    urldate = {2025-06-07},
+    journal = {Nature Communications},
+    author = {McClean, Jarrod R. and Boixo, Sergio and Smelyanskiy, Vadim N. and Babbush, Ryan and Neven, Hartmut},
+    month = nov,
+    year = {2018},
+    pages = {4812},
+}
+@misc{maciejewski_design_2024,
+    title = {Design and execution of quantum circuits using tens of superconducting qubits and thousands of gates for dense {Ising} optimization problems},
+    url = {http://arxiv.org/abs/2308.12423},
+    doi = {10.48550/arXiv.2308.12423},
+    abstract = {We develop a hardware-efficient ansatz for variational optimization, derived from existing ansatze in the literature, that parametrizes subsets of all interactions in the Cost Hamiltonian in each layer. We treat gate orderings as a variational parameter and observe that doing so can provide significant performance boosts in experiments. We carried out experimental runs of a compilation-optimized implementation of fully-connected Sherrington-Kirkpatrick Hamiltonians on a 50-qubit linear-chain subsystem of Rigetti Aspen-M-3 transmon processor. Our results indicate that, for the best circuit designs tested, the average performance at optimized angles and gate orderings increases with circuit depth (using more parameters), despite the presence of a high level of noise. We report performance significantly better than using a random guess oracle for circuits involving up to approx 5000 two-qubit and approx 5000 one-qubit native gates. We additionally discuss various takeaways of our results toward more effective utilization of current and future quantum processors for optimization.},
+    urldate = {2025-06-08},
+    publisher = {arXiv},
+    author = {Maciejewski, Filip B. and Hadfield, Stuart and Hall, Benjamin and Hodson, Mark and Dupont, Maxime and Evert, Bram and Sud, James and Alam, M. Sohaib and Wang, Zhihui and Jeffrey, Stephen and Sundar, Bhuvanesh and Lott, P. Aaron and Grabbe, Shon and Rieffel, Eleanor G. and Reagor, Matthew J. and Venturelli, Davide},
+    month = sep,
+    year = {2024},
+    note = {arXiv:2308.12423 [quant-ph]},
+    keywords = {Computer Science - Emerging Technologies, Quantum Physics},
+}

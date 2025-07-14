@@ -1,78 +1,104 @@
 \section{Related Work}
 \label{sec:related_work}
 
-\subsection{Why direct QUBO formulations break down}
+Most efforts to bring quantum hardware into large-scale optimisation
+tackle one (or more) of three technical pain-points:
+(i) cutting the sheer number of qubits needed to hold a problem
+instance, (ii) enforcing hard constraints without delicate penalty
+weights, and (iii) training variational circuits reliably on noisy,
+depth-limited devices.  We sketch the main ideas in each line of work
+and indicate how our approach builds on them.
 
-Classical embeddings typically cast a combinational problem as a
-\emph{Quadratic Unconstrained Binary Optimisation}:
+% -------------------------------------------------
+\subsection{Shrinking quantum circuit width}
 
-\begin{equation}
-\min_{x\in\{0,1\}^{n}} \; x^{\mathsf T} Q\,x,
-\qquad
-Q\in\mathbb{R}^{n\times n},
-\label{eq:qubo_def}
-\end{equation}
+\textit{Why width matters.}  
+A textbook QUBO maps each binary decision to one qubit.
+In routing problems that decision might be
+“edge $(i,j)$ is flown at time slot~$t$ by drone~$d$,”
+so even a 10-node graph quickly explodes to
+$10^{4}$–$10^{5}$ variables—far beyond today’s $\mathcal{O}(10^3)$-qubit hardware
+\cite{davies_quantum_2024}.
 
-where every feasibility constraint is absorbed into $Q$ via large
-penalty coefficients.
-In a 30–40-node drone-VRP,
-explicit edge–time–drone flags balloon to
-$\mathcal{O}(10^{4}\!-\!10^{5})$ binary variables, implying
-$\approx10^{5}$ qubits on quantum hardware.
+\textit{Log-index compression.}  
+Tan \emph{et al.}~\cite{tan_qubit-efficient_2021} showed that if the
+problem can be phrased as “pick one item from a selection of $N$
+options,” the catalogue index fits in only
+$\lceil\log_{2}N\rceil$ qubits.
+Feasibility is verified afterwards by a classical oracle, so extra qubits
+for penalty terms disappear.  Follow-up work has pushed the idea to
+finantical transaction settlement problems \cite{huber_exponential_2024} and vehicle routing with time
+windows \cite{leonidas_qubit_2023}, typically saving two orders
+of magnitude in width.
 
-\smallskip\noindent\textbf{Log-index remedy.}
-Our work adopts the \emph{register–ancilla paradigm}
-first outlined by Tan~et al.~\cite{tan_qubit-efficient_2021}:  
-a $\lceil\log_2 N\rceil$-qubit \textit{index register} encodes a route
-label $|r\rangle$, while a 2-qubit \textit{ancilla} stores the launch
-wave $|w\rangle$.  
-A projector $P_{\text{eq}}$ enforces the identity
-\[
-P_{\text{eq}}
-\bigl(|r\rangle_{\text{reg}}\otimes|w\rangle_{\text{anc}}\bigr)
-=
-\delta_{X_{\text{reg}},\,X_{\text{anc}}}
-\bigl(|r\rangle_{\text{reg}}\otimes|w\rangle_{\text{anc}}\bigr),
-\]
-so that feasibility checking is deferred to a classical oracle instead
-of quadratic penalties.
-The resulting 13-qubit layout replaces the dense $Q$ in
-Eq.~\eqref{eq:qubo_def} by a sparse, logarithmic-width representation,
-eliminating $\sim$95 \% of the qubit overhead while maintaining full
-expressiveness.
+Other encoding methods exists, like Pauli-Correlation Encoding (PCE)
+of Sciorilli et al. that captures higher-body Pauli statistics and provides a polynomial reduction in qubit-resources, yet optimises a non-convex tanh surrogate and lacks any link to linear-programming or semi-definite programming relaxations \cite{sciorilli_towards_2025}. Qubit-efficient QAOA by Sundar \& Dupont \cite{sundar_qubit-efficient_2024} maps $N$ bits into $q = d + log_2 (N/d)$ qubits and shows parameter clustering on SK glasses, but still samples from depth-p circuits.
 
-\subsection{Constraint‑preserving and dual‑hybrid approaches}
-Several authors eliminate penalty terms altogether via
-constraint‑preserving ansätze.  Examples include Lagrangian‑dual QAOA
-\cite{gabbassov_lagrangian_2025} and QAOA++ custom mixers \cite{fuchs_constrained_2022}.
+% -------------------------------------------------
+\subsection{Handling constraints without fragile penalties}
 
-\subsection{Model‑engineering and preprocessing in classical OR}
-Surveys on adaptive large‑neighbourhood search (ALNS)
-\cite{windras_mara_survey_2022} and modern matheuristics
-\cite{boschetti_contemporary_2024} emphasise that destroy‑and‑repair
-operators, column generation and branch‑and‑price hybrids often deliver
-larger gains than raw solver speed—echoing Hildebrandt’s early claim
-that model implementation is the true bottleneck
-\cite{hildebrandt_bottleneck_1981}.
+\textit{The penalty problem.}  
+Traditional QUBO inserts a huge coefficient into $Q$ every time a
+constraint could be violated. If the coefficient is too small, illegal
+solutions leak in; too large, and the quantum energy landscape develops
+enormous cliffs that ruin optimisation
+\cite{kochenberger_unconstrained_2014}.
 
-\subsection{Black‑box hyper‑parameter optimisation}
-AutoML frameworks—Hyperopt, SMAC, Optuna \cite{akiba_optuna_2019}—have
-displaced manual parameter tuning in ML and OR.  In the quantum realm,
-Bayesian optimisation cuts QAOA evaluations by an order of magnitude
-\cite{tibaldi_bayes_qaoa_2023}, motivating our use of Optuna’s aggressive
-TPE sampler in a CVaR‑VQE setting.
+\textit{Mixer-based approaches.}  
+Alternating-Operator Ansätze (AOA) restrict the quantum walk to the
+feasible sub-space from the outset, so \emph{no} penalty is needed
+\cite{maciejewski_design_2024,fuchs_constrained_2022}.  
+Custom mixers swap amplitudes only between states that already obey
+all constraints.
 
-\subsection{Quantum samplers in hybrid pipelines}
-Recent work treats NISQ devices primarily as probabilistic samplers
-embedded in classical loops: Sampling‑QAOA \cite{matsuyama2025},
-Generator‑Enhanced Optimisation \cite{albarran2024}, and CVaR‑QAOA
-\cite{barkoutsos_improving_2020}.  Our pipeline follows this philosophy,
-combining log‑index encoding with risk‑aware objectives to exploit
-NISQ‑era hardware efficiently.
+\textit{Dual and warm-start ideas.}  
+A complimentary strategy moves constraints into a smooth dual function
+\cite{gabbassov_lagrangian_2025}, or seeds the quantum circuit with a
+high-quality classical solution and lets the quantum layers make only
+local refinements \cite{egger_warm-starting_2021}.  
 
-\subsection{Alignment with probabilistic OR and generative AI}
-Cross‑entropy and generative‑model viewpoints are increasingly applied to
-combinatorial optimisation \cite{caramanis_optimizing_2023}.  This probabilistic
-stance mirrors industrial decision‑making, where operators trade
-expected cost against downside risk rather than chase a single
-deterministic optimum.
+
+% -------------------------------------------------
+\subsection{Training shallow, sample-efficient optimisers}
+
+\textit{Why shallow matters.}  Contemporary superconducting hardware can
+reliably execute only $10^{2}$–$10^{3}$ two-qubit gates before decoherence
+and crosstalk wash out the signal; for example, IBM’s 433-qubit
+\emph{Osprey} reports average two-qubit error rates of
+${\sim}2\times10^{-3}$ and recommends circuit depths below $250$
+layers \cite{ibm_heavy_hex_2019,ibm_quantum_volume_2023}.  Even if those
+fidelities improved, variational training still hits the
+\emph{barren-plateau} barrier: cost gradients decay
+exponentially with depth for generic ansätze \cite{cerezo_cost_2021,mcclean_barren_2018}.
+Staying shallow—or moving to sample-based objectives such as CVaR that do
+not rely on gradient information—therefore avoids both the hardware
+ceiling and the theoretical wall.
+
+
+\textit{Sampler-centric algorithms.}  
+Sampling-QAOA, CVaR-QAOA and Generator-Enhanced Optimisation treat the
+quantum computer purely as a noise-tolerant sampler, then
+post-select or re-weight samples classically
+\cite{matsuyama_sampling-based_2025,alcazar_enhancing_2024,barkoutsos_improving_2020}.  
+Born-machine models go one step further and \emph{learn} a distribution
+that puts most mass on good solutions
+\cite{kyriienko_born_2020}.
+
+\textit{Bayesian hyper-parameter search.}  
+Because every circuit evaluation is expensive, Bayesian optimisation
+has become the tuner of choice, cutting variational queries by an order
+of magnitude in QAOA studies \cite{tibaldi_bayesian_2023}.  
+Optuna’s Tree-Parzen Estimator (TPE) sampler
+\cite{akiba_optuna_2019} is particularly attractive because it
+integrates an early-stopping (“pruner’’) mechanism that trims off poor
+parameter regions quickly.
+
+% -------------------------------------------------
+\paragraph{Our contribution in context.}
+We inherit log-index compression to reduce circuit width,
+further enhance through keeping feasibility logic in a classical oracle rather than penalties and additional variables,
+and drive a shallow CVaR-VQE circuit with Bayesian Optimization.
+The combination produces a 13-qubit solver that
+beats a carefully tuned Genetic Algorithm on a realistic 30-node
+drone-routing instance—demonstrating that these three strands can be
+merged into a practical NISQ-era workflow.

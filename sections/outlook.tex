@@ -1,80 +1,35 @@
-% -------------------------------------------------
-\section{Discussion and Outlook}
+
+\section{Discussion}
 \label{sec:discussion}
 
-\paragraph{What we have shown.}
-This work provides the first evidence that a \emph{log-index, risk-aware}
-VQE can out-perform a tuned Genetic Algorithm on a
-battery– and wave-constrained drone VRP
-\emph{within the qubit and shot budgets of today’s 127-qubit hardware}.
-Our compressed 13-qubit register, millisecond oracle,
-and CVaR-TPE synergy together yield a \textbf{6–8\,\%} mean-cost edge
-that survives realistic \texttt{ibm\_fez} noise.
+\subsection{Summary of Contributions}
 
-\paragraph{Limitations.}
-\begin{enumerate}
-    \item \textbf{Single instance.}  We benchmark on one 30–40-node graph.
-          Although it is industry-derived, multi-instance validation
-          (including dynamic or larger fleets) is future work.
-    \item \textbf{Route pool fixed \emph{a priori}.}
-          The classical soft-max generator is outside the quantum loop.
-          Hybrid schemes that \emph{co-evolve} the pool (e.g.\ column
-          generation) remain unexplored.
-    \item \textbf{Baseline scope.}  GA is a strong black-box competitor,
-          but other meta-heuristics (ALNS, simulated annealing, branch-and-price
-          with tailored pricing) could be added to the comparison set.
-    \item \textbf{Noise model.}  We simulated calibrated noise rather than
-          executing on hardware.  Real runs will add queue latency,
-          calibration drift and SWAP overheads.
-\end{enumerate}
+This work provides the first evidence that a log-index, risk-aware CVaR-compressed-VQE can outperform a tuned Genetic Algorithm on a battery- and wave-constrained drone VRP within the qubit and shot budgets of today's 127-qubit hardware. Our key contribution lies in shifting feasibility checking and constraint handling entirely into an efficient classical preprocessing step, allowing the quantum variational eigensolver to act solely as a combinational optimizer of optimal route subsets. Unlike traditional QUBO formulations, which quickly become qubit-intensive and prone to complicated penalty-tuning requirements, our approach retains the expressive power necessary for realistic logistics problems without encountering exponential qubit overhead.
 
-\paragraph{Near-term extensions.}
-\begin{itemize}[nosep,leftmargin=*]
-\item \textbf{Adaptive $\alpha$ schedules.}  Start with a larger
-      risk-averse $\alpha$ to guide exploration, then anneal toward the
-      mean to refine exploitation.
-\item \textbf{Layer-depth sweet spot under noise.}  Our data
-      suggests $L\!=\!2$ is the “knee”; running L=3–5 on trapped-ion or
-      neutral-atom devices with lower CNOT error could test whether the
-      shallow optimum is hardware- or algorithm-limited.
-\item \textbf{Column-generation hybrid.}  Use the quantum engine as the
-      pricing oracle in a branch-and-price framework—reintroducing global
-      optimality certificates without exploding qubit count.
-\item \textbf{Dynamic replanning.}  Because the oracle latency is
-      $\approx1$ ms, an online setting where new orders arrive mid-flight
-      is within reach.  A streaming CVaR-VQE could continuously
-      re-optimise the remaining routes.
-\end{itemize}
+Our compressed 13-qubit register, combined with CVaR-TPE optimization, yields a consistent 6--8\% mean-cost advantage that survives realistic \texttt{ibm\_fez} noise conditions. Central to this success is the synergy between conditional-value-at-risk objectives and Bayesian hyperparameter optimization, which elegantly addresses the noise challenges inherent in near-term quantum computing. The CVaR objective explicitly focuses optimization on the best-performing tail of the sampled cost distribution, significantly reducing variance from finite quantum shots and Monte-Carlo sampling, while TPE naturally exploits the smoothed optimization landscape created by CVaR.
 
-\paragraph{Long-term outlook.}
-As gate fidelities improve and error-mitigation becomes cheaper, the
-log-index idea scales gracefully:
-a 10{,}000-route pool still fits in $\,\lceil\log_2 10{,}000\rceil+2=16$
-qubits, well inside the 100-qubit NISQ envelope.
-The bottleneck will shift from qubit \emph{count} to circuit \emph{depth}
-and oracle evaluation cost.
-Our framework already exposes two independent levers—shots and Monte-Carlo
-draws—to trade quantum time against classical CPU, suggesting a
-resource-adaptive workflow for future heterogeneous schedulers.
+\subsection{Practical Deployment Considerations}
 
-\paragraph{Take-away.}
-The study demonstrates that \emph{compressed, black-box quantum search}
-is a viable strategy for real logistics constraints \textbf{today},
-without waiting for fault-tolerance or bespoke QUBO tailoring.
-We hope the open-source release stimulates follow-on work that pushes
-both the industrial realism and the quantum–classical hybrid boundary.
+Our approach demonstrates clear advantages for near-term implementation. The 13-qubit circuits with fewer than 180 two-qubit gates fit comfortably on current 127-qubit IBM devices, positioning the method for immediate deployment. The two-stage architecture naturally extends to larger instances, with classical preprocessing handling constraint complexity while quantum optimization scales logarithmically with route pool size. The framework accommodates time windows, multi-trip scheduling, and dynamic re-routing by modifying the classical filter stage while preserving the quantum core.
 
+The coverage shortfall observed in both quantum and classical solvers (approximately 82\% node coverage) results from our greedy duplicate-removal heuristic and affects both methods equally, preserving fair comparison. Pilot tests demonstrate that increasing the missed-delivery penalty $\lambda_0$ or adding local re-insertion restores full coverage without altering the quantum-classical performance ranking.
 
-\section{Discussion & Outlook}
+\subsection{Limitations and Scope}
 
-In this study, we have introduced and demonstrated a novel approach to quantum combinational optimization specifically tailored to the drone vehicle routing problem (D-VRP). Our key contribution lies in shifting feasibility checking and constraint handling entirely into an efficient classical pre-processing step, allowing the quantum variational eigensolver (VQE) to act solely as a combinational "black-box learner" of optimal route subsets. Unlike traditional Quadratic Unconstrained Binary Optimization (QUBO) formulations, which quickly become qubit-intensive and prone to barren plateaus and complicated penalty-tuning requirements, our approach retains the expressive power necessary for realistic logistics problems without encountering exponential qubit overhead.
+Several limitations warrant acknowledgment. First, we benchmark on a single 30--40-node graph instance derived from industry collaboration with Thales UK. While realistic, multi-instance validation across diverse geographic layouts, fleet compositions, and constraint profiles represents important future work. Second, our route pool remains fixed \emph{a priori}, with the classical soft-max generator operating outside the quantum loop. Hybrid schemes that co-evolve the route pool through techniques like column generation remain unexplored. Third, while GA represents a strong black-box competitor widely used in industry, other meta-heuristics such as adaptive large neighborhood search, simulated annealing, or branch-and-price with tailored pricing could strengthen the comparison baseline. Finally, we simulated calibrated noise rather than executing on hardware, where real runs will encounter additional queue latency, calibration drift, and SWAP overheads.
 
-Central to our strategy is the combined use of a conditional-value-at-risk (CVaR) objective and a Bayesian hyper-parameter optimization framework (Optuna's Tree-Parzen Estimator, TPE). This combination elegantly addresses the noise challenges inherent in near-term quantum computing. Specifically, the CVaR objective explicitly focuses optimization on the worst-performing tail of the sampled cost distribution, significantly reducing the variance introduced by finite quantum shots and Monte-Carlo sampling steps. TPE then naturally exploits the smoothed optimization landscape created by CVaR, further improving the robustness and speed of convergence.
+\subsection{Future Research Directions}
 
-Our experiments show that this approach yields substantial practical benefits. Using just 13 qubits for realistic scenarios involving 2,048 feasible routes and 4 launch waves, our method consistently outperformed a carefully tuned Genetic Algorithm (GA) baseline by 6–8%, under identical computational budgets. Importantly, this quantum advantage remained robust even when tested against realistic hardware noise modeled after IBM's calibrated \texttt{ibm\_fez} quantum backend. Notably, shallow circuit depths (1–2 layers) were sufficient, demonstrating that such near-term quantum hardware is already capable of achieving meaningful performance improvements in industrial-scale logistics problems.
+Several promising extensions emerge from this work. Adaptive $\alpha$ schedules could start with larger risk-averse values to guide exploration, then anneal toward the mean for exploitation refinement. Our data suggests $L=2$ represents a circuit depth "knee," motivating investigation of deeper circuits on trapped-ion or neutral-atom devices with lower gate errors to determine whether the shallow optimum reflects hardware or algorithmic limitations. Column-generation hybrids could employ the quantum engine as a pricing oracle within branch-and-price frameworks, reintroducing global optimality certificates without exploding qubit count.
 
-However, several open questions and limitations remain to be addressed. First, the current study used a single realistic graph instance derived from Thales UK, raising questions about generalizability to other types of graphs and constraints. Future studies should therefore systematically test performance across diverse VRP scenarios, including different geographic layouts, fleet compositions, and constraint profiles. Moreover, while our method assumes relatively straightforward cost oracle computations, its effectiveness for arbitrary black-box functions returning binary bit-string costs remains an open and exciting question.
+Dynamic replanning represents an particularly exciting direction. With oracle latency of approximately 1~ms, online settings where new orders arrive mid-flight become feasible. A streaming CVaR-VQE could continuously re-optimize remaining routes, leveraging the framework's resource-adaptive workflow that trades quantum time against classical CPU through independent shot and Monte-Carlo draw controls.
 
-Looking forward, our approach aligns with emerging trends in quantum optimization, moving beyond monolithic QUBO-based frameworks towards sampler-centric methodologies. Particularly promising avenues include embedding our compressed qubit encoding as a node-scorer within quantum-assisted branch-and-bound algorithms, integrating parameter-free generative quantum circuits to eliminate classical parameter optimization entirely, and exploring multi-stage CVaR objectives that explicitly model stochastic events such as weather delays or dynamic mission updates. Each of these paths leverages the compact and flexible nature of our log-index encoding and quantum-sampling strategy, underscoring the broad potential and versatility of our framework.
+\subsection{Long-term Outlook}
 
-In conclusion, our results clearly illustrate that quantum sampler-centric optimization, leveraging classical pre-processing and minimal qubit encoding, is not only viable but can already offer tangible performance benefits for complex, constraint-rich combinational problems. We believe that our methodology provides a practical and scalable route towards near-term quantum advantage in logistics optimization and beyond.
+As gate fidelities improve and error mitigation becomes more efficient, the log-index encoding scales gracefully. A 10,000-route pool still requires only $\lceil\log_2 10,000\rceil + 2 = 16$ qubits, well within the 100-qubit NISQ envelope. The bottleneck will shift from qubit count to circuit depth and oracle evaluation cost, where our framework's exposed control levers enable resource-adaptive optimization for future heterogeneous quantum-classical schedulers.
+
+Our approach aligns with emerging trends in quantum optimization, moving beyond monolithic QUBO-based frameworks toward sampler-centric methodologies. Particularly promising avenues include embedding compressed qubit encodings as node scorers within quantum-assisted branch-and-bound algorithms, integrating parameter-free generative quantum circuits to eliminate classical parameter optimization entirely, and exploring multi-stage CVaR objectives that explicitly model stochastic events such as weather delays or dynamic mission updates.
+
+\subsection{Conclusion}
+
+This study demonstrates that compressed, black-box quantum search represents a viable strategy for real logistics constraints today, without requiring fault-tolerance or bespoke QUBO tailoring. Our results clearly illustrate that quantum sampler-centric optimization, leveraging classical preprocessing and minimal qubit encoding, can already offer tangible performance benefits for complex, constraint-rich combinatorial problems. We believe this methodology provides a practical and scalable route toward near-term quantum advantage in logistics optimization and beyond. The open-source release accompanying this work aims to stimulate follow-on research that pushes both industrial realism and the quantum-classical hybrid boundary.

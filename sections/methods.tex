@@ -8,23 +8,23 @@
 Let $G=(V,E)$ be an undirected graph with depot node $0$ and
 $|V|-1$ customer nodes.  Each edge $(u,v)\in E$ is annotated with
 
-\[
-\bigl(t_{uv}, \; b_{uv}, \; c_{uv}\bigr)
-\qquad
-\text{travel time, battery usage, no‑fly flag.}
-\]
+\begin{equation}
+    \bigl(t_{uv}, \; b_{uv}, \; c_{uv}\bigr)
+    \qquad
+    \text{travel time, battery usage, no‑fly flag.}
+\end{equation}
 
 A \emph{feasible route} $r\in\mathcal{R}$ is a simple cycle starting and
 ending at the depot that satisfies
 
-\[
-\textstyle
-\sum_{(u,v)\in r} b_{uv} \le B_{\max},
-\quad
-\sum_{v\in r} d_v \le Q_{\max},
-\quad
-c_{uv}=0 \;\forall(u,v)\in r.
-\]
+\begin{equation}
+    \textstyle
+    \sum_{(u,v)\in r} b_{uv} \le B_{\max},
+    \quad
+    \sum_{v\in r} d_v \le Q_{\max},
+    \quad
+    c_{uv}=0 \;\forall(u,v)\in r.
+\end{equation}
 
 Given a pre‑computed pool of $N_{routes}$ feasible routes
 $\mathcal{R}=\{r_1,\dots,r_{N_{routes}}\}$ and $M=N_{waves}$ discrete launch
@@ -56,7 +56,7 @@ To avoid exponential qubit scaling, we split the drone routing problem into two 
 
 Directly optimizing drone routes considering all constraints remains computationally challenging. Therefore, we introduce a classical preprocessing phase that dramatically reduces subsequent computational complexity. We represent the operational environment as a sparse undirected graph $G=(V,E)$, where nodes correspond to depots and customer locations. Edges between nodes are established via a Delaunay triangulation augmented by direct depot-to-customer connections, forming a practical, sparse ``star-plus-local'' topology. Each edge $(u,v)$ is annotated with travel time $t_{uv}$, battery consumption $b_{uv}$, and no-fly zone constraints $c_{uv}$.
 
-We generate feasible drone routes via a greedy soft-max heuristic (Algorithm~\ref{alg:softmax}, Appendix~\ref{app:algorithms}). This algorithm iteratively selects subsequent nodes probabilistically based on incremental travel cost and a temperature parameter $S$ that balances exploration and exploitation. Any generated route violating battery capacity $B_{\max}$ or payload constraints $Q_{\max}$ is immediately discarded, guaranteeing feasibility by construction.
+We generate feasible drone routes via a greedy soft-max heuristic (Algorithm A.~\ref{alg:softmax}, Appendix A.~\ref{app:algorithms}). This algorithm iteratively selects subsequent nodes probabilistically based on incremental travel cost and a temperature parameter $S$ that balances exploration and exploitation. Any generated route violating battery capacity $B_{\max}$ or payload constraints $Q_{\max}$ is immediately discarded, guaranteeing feasibility by construction.
 
 \subsection{Subset-Route Combinational Optimization}
 
@@ -82,13 +82,13 @@ Robust decision-making under uncertainty requires a cost evaluation scheme sensi
 
 \begin{equation}
 \begin{split}
-C(\mathcal{S}) &= 10 T_{\max} + \lambda_E \sum_{(u,v)\in E_c} (1-\mathbb{1}_{uv})^2 + \lambda_V \sum_{v>0}(1-\mathbb{1}_v)^2 \\
-&\quad + \lambda_0 \sum_{v>0}\mathbb{1}_v^{\text{miss}} + \lambda_W (\text{overbook})^2
+C(\mathcal{S}) &= T_{\max} + \lambda_E \sum_{(u,v)\in E_c} (1-\mathbbm{1}_{uv})^2 + \lambda_V \sum_{v>0}(1-\mathbbm{1}_v)^2 
+\quad + \lambda_0 \sum_{v>0}\mathbbm{1}_v^{\text{miss}} + \lambda_W (\text{overbook})^2
 \end{split}
 \label{eq:cost}
 \end{equation}
 
-In this formulation, $\mathbb{1}_{uv}$ indicates whether an edge $(u,v)$ is traversed, and $\mathbb{1}_v$ indicates node coverage. Penalty terms strongly discourage constraint violations, ensuring robust solutions.
+In this formulation, $\mathbbm{1}_{uv}$ indicates whether an edge $(u,v)$ is traversed, and $\mathbbm{1}_v$ indicates node coverage. Penalty terms strongly discourage constraint violations, ensuring robust solutions.
 
 We minimize the Conditional Value-at-Risk (CVaR) to handle the inherent stochasticity in quantum sampling:
 
