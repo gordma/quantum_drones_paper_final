@@ -9,7 +9,7 @@ sustainability, and regulatory compliance.\footnote{``Urban Fulfillment Outlook 
 Autonomous drone fleets represent a compelling solution to these challenges,
 with pilot programs by UPS Flight Forward, Zipline, and Wing demonstrating their
 potential to deliver small parcels rapidly while significantly reducing labor and
-carbon emissions \cite{murray2020survey}.
+carbon emissions \cite{murray_multiple_2020}.
 Despite this promise, widespread commercialization remains elusive, largely due to
 the complex optimization challenges inherent in scaling from controlled pilots to
 real-world deployment.
@@ -20,27 +20,24 @@ wave-based launch schedules, and tight customer time windows.
 While exact optimization methods such as Mixed-Integer Linear Programming (MILP) or Branch-and-Price
 can theoretically solve these problems, industry experience consistently identifies the dominant bottleneck
 as the extensive human effort required to model and refine these optimization scenarios,
-rather than solver runtime \cite{hildebrandt_bottleneck_1981,boschetti_matheuristics_2024,kallrath_mixed_2000}.
+rather than solver runtime \cite{hildebrandt_implementation_1981,boschetti_contemporary_2024,kallrath_mixed_2000}.
 This modeling overhead—requiring specialized expertise to define, tune, and refine optimization
 models—often proves prohibitively expensive in real-world deployments.
 Consequently, drone logistics providers frequently resort to heuristic methods,
 sacrificing optimality to circumvent this modeling burden.
 
-Quantum computing has emerged as a potential remedy,
-offering substantial parallelism for combinatorial optimization problems.
+Quantum computing has simultaneously emerged as a potential remedy,
+offering a different paradigmatic approach for addressing large-scale combinatorial optimization problems.
 Yet initial quantum implementations of drone-routing and similar Vehicle Routing Problems (VRP)
 using standard Quadratic Unconstrained Binary Optimization (QUBO) encodings quickly encounter severe limitations:
-a modest four-node scenario already demands hundreds of binary variables after MILP linearization,
-exceeding current quantum hardware capabilities \cite{davies_quantum_2024}.
-These formulations not only require high qubit counts but also introduce challenging
-integrality gaps and complicated penalty parameter tuning \cite{kochenberger2014qubo_review}.
+a modest four-node scenario already demands hundreds of binary variables after MILP linearization, despite the efforts to reduce variable-count,
+exceeding current quantum hardware capabilities \cite{davies_quantum_2024}. 
 
 To address this qubit explosion, a diverse family of \emph{qubit-efficient encoding schemes} has recently emerged.
 Minimal encodings introduced by Tan et al.~\cite{tan_qubit-efficient_2021}, 
-and subsequently refined by Huber et al.~\cite{huber_exponential_2024} and Leonidas et al.~\cite{leonidas_qubit_2024}, 
-compress resources exponentially by encoding each variable within the Bloch sphere 
-and extracting correlations through register projections.
-However, these methods inherently remain at a mean-field Sherali–Adams level-1 (SA\(^1\)) relaxation,
+and subsequently refined by Huber et al. for a domain-specific transaction settlement problem ~\cite{huber_exponential_2024} and Leonidas et al. for vehicle routing problem with time windows for shipping logistics ~\cite{leonidas_qubit_2024}, 
+compress resources exponentially by encoding each variable within the Bloch sphere and extracting correlations through register projections.
+However, these methods inherently remain a mean-field linear-relaxation heuristic,
 which can incur worst-case integrality gaps of at least 2x on canonical combinatorial problems such as Max-Cut~\cite{charikar_integrality_2009}.
 Pauli-Correlation Encoding (PCE), proposed by Sciorilli et al.~\cite{sciorilli_towards_2025}, 
 captures higher-order Pauli correlations but optimizes a non-convex \(\tanh\) surrogate objective, 
@@ -56,10 +53,10 @@ An alternative, complementary approach gaining traction is the integration of qu
 probabilistic, risk-aware samplers embedded within sophisticated classical preprocessing workflows.
 Recent advances frame the quantum device as part of a hybrid quantum-classical optimization loop,
 explicitly shifting feasibility management to classical preprocessing while allowing quantum
-hardware to specialize purely on combinatorial subset selection \cite{matsuyama2025,albarran2024}.
+hardware to specialize purely on combinatorial subset selection \cite{matsuyama_sampling-based_2025}.
 Such hybrid pipelines naturally incorporate modern AutoML techniques like Bayesian optimization (Optuna),
 which systematically replace manual parameter tuning, 
-making them especially appealing for practical industry deployment \cite{akiba_optuna_2019,tibaldi_bayes_qaoa_2023,caramanis2023}.
+making them especially appealing for practical industry deployment \cite{akiba_optuna_2019,tibaldi_bayesian_2023,caramanis_optimizing_2023}.
 
 \textbf{Our approach and contributions.} 
 In this paper, we introduce a novel hybrid quantum-classical optimization framework specifically tailored for drone logistics,
@@ -84,5 +81,5 @@ The remainder of the paper is structured as follows.
 In Section~\ref{sec:related_work}, we situate our contributions within existing approaches and recent developments in quantum optimization methods.
 Section~\ref{sec:problem} rigorously defines the Subset-Route Drone VRP, providing explicit mathematical and operational constraints.
 In Section~\ref{sec:methods}, we detail the classical preprocessing, qubit-efficient encoding, and quantum optimization procedures.
-Extensive experimental results, benchmarking against classical methods, and detailed discussion appear in Section~\ref{sec:experiments_results},
+Extensive experimental results, benchmarking against classical methods, and detailed discussion appear in Section~\ref{sec:experiments},
 followed by concluding remarks, practical considerations, and avenues for future research in Section~\ref{sec:discussion}.

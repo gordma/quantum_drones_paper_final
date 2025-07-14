@@ -34,18 +34,14 @@ performance across random seeds.
 
 Aggressive TPE significantly outperforms Default TPE, confirming that CVaR 
 benefits from exploitation-heavy search. Comprehensive optimizer ablation studies 
-(Appendix~\ref{sec:appendix_optimizer_ablation}) demonstrate that quantum advantage 
-persists across all Bayesian optimization strategies, ruling out hyperparameter 
-optimization as the source of performance gains.
+(Appendix~\ref{sec:appendix_optimizer_ablation}) demonstrate that quantum advantage persists across all Bayesian optimization strategies, ruling out hyperparameter optimization as the source of performance gains, as compared to a tuned genetic algorithm baseline for black-box exploration algorithms.
 
 Table~\ref{tab:main_results} compares all methods under the fair 
-200{,}000-evaluation budget, with the GA baseline representing the best performance 
-achievable after extensive mutation rate optimization. The quantum approach demonstrates robust 
-superiority over this rigorously tuned classical baseline.
+200{,}000-evaluation budget, with the GA baseline representing the best performance achievable after extensive mutation rate optimization. The quantum approach demonstrates robust superiority over this rigorously tuned classical baseline.
 
 \input{tables/latex_fragments/01_main_results.tex}
 
-This result aligns with CVaR theory: since we focus on the lowest 5\% of cost 
+This result aligns with CVaR theory: since we focus on the best 5\% of cost 
 samples, aggressive exploitation of promising parameter regions becomes more 
 valuable than broad exploration.
 

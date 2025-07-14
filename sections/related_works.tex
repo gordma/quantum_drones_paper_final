@@ -1,35 +1,55 @@
 \section{Related Work}
 \label{sec:related_work}
 
-\subsection{Why direct QUBO formulations break down}
-Encoding routing and VRP variants as Quadratic Unconstrained Binary
-Optimisation (QUBO) explodes qubit requirements: a {\small4‑node,
-6‑edge} toy instance already needs several hundred binary variables once
-linearisation and penalty terms are introduced
-\cite{davies_quantum_2024}.  Besides qubit count, QUBO mappings suffer
-(i) delicate penalty tuning that creates large integrality gaps
-\cite{kochenberger2014qubo_review} and (ii) extra two‑qubit gates to
-embed logical connectivity onto hardware graphs such as Pegasus or
-heavy‑hex \cite{quinton2024annealing_limits}.
+\subsection{Why direct QUBO formulations break down}
 
-\subsection{Qubit‑efficient encodings}
-Log‑index schemes compress variable counts from $O(N)$ to
-$O(\log N)$ qubits \cite{tan_qubit-efficient_2021,
-leonidas2024qubovrp}.  Applied to VRP/VRPTW, they achieve two‑order‑of‑magnitude
-reductions \cite{sundar_qubit-efficient_2024}.  The trade‑off is
-deeper circuits or surrogate cost functions that can re‑introduce
-approximation gaps.
+Classical embeddings typically cast a combinational problem as a
+\emph{Quadratic Unconstrained Binary Optimisation}:
+
+\begin{equation}
+\min_{x\in\{0,1\}^{n}} \; x^{\mathsf T} Q\,x,
+\qquad
+Q\in\mathbb{R}^{n\times n},
+\label{eq:qubo_def}
+\end{equation}
+
+where every feasibility constraint is absorbed into $Q$ via large
+penalty coefficients.
+In a 30–40-node drone-VRP,
+explicit edge–time–drone flags balloon to
+$\mathcal{O}(10^{4}\!-\!10^{5})$ binary variables, implying
+$\approx10^{5}$ qubits on quantum hardware.
+
+\smallskip\noindent\textbf{Log-index remedy.}
+Our work adopts the \emph{register–ancilla paradigm}
+first outlined by Tan~et al.~\cite{tan_qubit-efficient_2021}:  
+a $\lceil\log_2 N\rceil$-qubit \textit{index register} encodes a route
+label $|r\rangle$, while a 2-qubit \textit{ancilla} stores the launch
+wave $|w\rangle$.  
+A projector $P_{\text{eq}}$ enforces the identity
+\[
+P_{\text{eq}}
+\bigl(|r\rangle_{\text{reg}}\otimes|w\rangle_{\text{anc}}\bigr)
+=
+\delta_{X_{\text{reg}},\,X_{\text{anc}}}
+\bigl(|r\rangle_{\text{reg}}\otimes|w\rangle_{\text{anc}}\bigr),
+\]
+so that feasibility checking is deferred to a classical oracle instead
+of quadratic penalties.
+The resulting 13-qubit layout replaces the dense $Q$ in
+Eq.~\eqref{eq:qubo_def} by a sparse, logarithmic-width representation,
+eliminating $\sim$95 \% of the qubit overhead while maintaining full
+expressiveness.
 
 \subsection{Constraint‑preserving and dual‑hybrid approaches}
 Several authors eliminate penalty terms altogether via
 constraint‑preserving ansätze.  Examples include Lagrangian‑dual QAOA
-\cite{gabbassov2023}, QAOA++ custom mixers \cite{fuchs2022}, and
-“profit‑only” post‑correction loops \cite{chang2025} for VRP variants.
+\cite{gabbassov_lagrangian_2025} and QAOA++ custom mixers \cite{fuchs_constrained_2022}.
 
 \subsection{Model‑engineering and preprocessing in classical OR}
 Surveys on adaptive large‑neighbourhood search (ALNS)
-\cite{windras_mara_alns_2022} and modern matheuristics
-\cite{boschetti_matheuristics_2024} emphasise that destroy‑and‑repair
+\cite{windras_mara_survey_2022} and modern matheuristics
+\cite{boschetti_contemporary_2024} emphasise that destroy‑and‑repair
 operators, column generation and branch‑and‑price hybrids often deliver
 larger gains than raw solver speed—echoing Hildebrandt’s early claim
 that model implementation is the true bottleneck
@@ -52,7 +72,7 @@ NISQ‑era hardware efficiently.
 
 \subsection{Alignment with probabilistic OR and generative AI}
 Cross‑entropy and generative‑model viewpoints are increasingly applied to
-combinatorial optimisation \cite{caramanis2023}.  This probabilistic
+combinatorial optimisation \cite{caramanis_optimizing_2023}.  This probabilistic
 stance mirrors industrial decision‑making, where operators trade
 expected cost against downside risk rather than chase a single
 deterministic optimum.

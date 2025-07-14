@@ -42,13 +42,13 @@ We employ a hardware-efficient variational ansatz with $L \in \{1, 2\}$ layers, 
 Shallow circuits align with NISQ-era coherence limits while maintaining expressivity for the compressed encoding.
 
 \subsubsection{Risk-Aware Objective}
-Rather than optimizing the expectation $\mathbb{E}[C]$, we minimize the Conditional Value-at-Risk:
-\begin{equation*}
+Rather than optimizing the expectation $\mathbb{E}[C]$, we minimize the Conditional Value-at-Risk cost where the best $\alpha$-percentile of $N$ bitstrings drawn contributes to the objective function \cite{barkoutsos_improving_2020}:
+\begin{equation}
     \text{CVaR}_\alpha[C] = \mathbb{E}[C \mid C \geq \text{VaR}_\alpha[C]]
-\end{equation*}
+\end{equation}
 
 
-with $\alpha \in \{0.05, 0.1, 1.0\}$ focusing optimization on worst-case tail costs.
+with $\alpha \in \{0.05, 0.1, 1.0\}$ focusing optimization on best-case tail costs.
 This naturally handles heteroscedastic noise from (i) quantum shot sampling and (ii) Monte Carlo route subset evaluation.
 
 \subsubsection{Bayesian Optimization}
@@ -59,7 +59,7 @@ We employ Optuna's Aggressive TPE sampler with hyperparameters:
     \item \texttt{MedianPruner} with 90\% retention
 \end{itemize}
 
-This configuration emerged from systematic comparison against Default-TPE and Random sampling across multiple trial budgets.
+This configuration emerged from systematic comparison against Default-TPE and Random sampling across multiple trial budgets, see Appendix \ref{sec:appendix_parameters}.
 
 % \textit{Data source: Bayesian optimization comparison documented in experiments/ga\_analysis/BAYESIAN\_OPTIMIZATION\_COMPARISON.md with performance analysis across conservative/default/aggressive TPE variants.}
 
@@ -95,10 +95,10 @@ Noiseless baselines use identical hyperparameters, enabling direct measurement o
 
 % \textit{Data source: Noise robustness studies in experiments/vqe\_noise\_L1\_a0.05/, experiments/vqe\_noise\_L2\_a0.05/, and experiments/vqe\_noise\_L2\_a1.0/ covering all optimizer$\times$noise combinations.}
 
-\subsection{Reproducibility}
+% \subsection{Reproducibility}
 
-All experimental configurations, random seeds, and hyperparameters are documented in experiments/EXPERIMENT\_MASTER\_LOG.md.
-The complete codebase is released under MIT license with dependency specifications in requirements.txt.
-Figure generation scripts in figures/scripts/ ensure reproducible visualization of all results.
+% All experimental configurations, random seeds, and hyperparameters are documented in experiments/EXPERIMENT\_MASTER\_LOG.md.
+% The complete codebase is released under MIT license with dependency specifications in requirements.txt.
+% Figure generation scripts in figures/scripts/ ensure reproducible visualization of all results.
 
 % TODO: Add experimental timeline and computational resources used

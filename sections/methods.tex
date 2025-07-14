@@ -1,4 +1,8 @@
-\section{Problem Definition: Subset‑Route Drone VRP}
+
+\section{Methods}
+\label{sec:methods}
+
+\subsection{Problem Definition: Subset‑Route Drone VRP}
 \label{sec:problem}
 
 Let $G=(V,E)$ be an undirected graph with depot node $0$ and
@@ -40,14 +44,13 @@ waves, the optimisation task is to
 
 where $C(\mathcal{S})$ is the mission cost defined in
 Eq.\,\eqref{eq:cost}.  The search space size is
-${\small\binom{N_{routes}}{k} M^{k}}$, motivating a logarithmic
+$\mathcal{O}\big({\small\binom{N_{routes}}{k} M^{k}}\big)$, motivating a logarithmic
 $\lceil\log_2 N_{routes}\rceil+\lceil\log_2 M\rceil$‑qubit encoding for
 quantum optimisation.
 
-\section{Methods}
 \subsection{Solution Overview}
 
-To avoid exponential qubit scaling, we split the drone routing problem into two stages. We first filter thousands of constraint-violating routes classically, then apply quantum optimization to select the best feasible subset. This hybrid approach reduces a 275-qubit QUBO problem to just 13 qubits while preserving solution quality.
+To avoid exponential qubit scaling, we split the drone routing problem into two stages. We first filter thousands of constraint-violating routes classically, then apply quantum optimization to select the best feasible subset. This hybrid approach reduces an $\mathcal{O}(10^4 - 10^5)$ problem to just 13 qubits while preserving solution quality.
 
 \subsection{Classical Preprocessing and Feasibility Filtering}
 
@@ -106,12 +109,9 @@ Rigorous evaluation of quantum solutions necessitates benchmarking against well-
 
 \subsection{Experimental Configuration}
 
-Table~\ref{tab:hyperparams} provides a comprehensive overview of the hyperparameters and configurations used across experiments. Quantum optimization employs a hardware-efficient variational ansatz consisting of $L \in \{1,2\}$ layers, with $N_{\text{shots}}=4096$ circuit evaluations and $N_{\text{mc}}=2000$ Monte Carlo samples for robust cost estimation.
+Table~\ref{tab:hyperparams} provides a comprehensive overview of the hyperparameters and configurations used across experiments. Quantum optimization employs a hardware-efficient variational ansatz consisting of $L \in \{1,2\}$ layers, with $N_{\text{shots}}=10000$ circuit evaluations and $N_{\text{mc}}=1000$ Monte Carlo samples for robust cost estimation.
 
 This structured methodological framework systematically reduces quantum optimization complexity while maintaining robust solution quality, demonstrating a viable path toward practical quantum advantage in realistic drone logistics applications.
-
-
-\subsection{Default Hyper-parameters}
 
 \begin{table}[H]
 \centering
@@ -122,12 +122,11 @@ Parameter & Symbol & Value \\
 Battery capacity & $B_{\max}$ & 80 \\
 Payload capacity & $Q_{\max}$ & 50 \\
 Selected routes & $k$ & 10 \\
-Circuit shots & $N_{\text{shots}}$ & 4\,096 \\
-MC samples & $N_{\text{mc}}$ & 2\,000 \\
-CVaR tail & $\alpha$ & 0.05 \\
-Ansatz layers & $L$ & 1–2 \\
+Circuit shots & $N_{\text{shots}}$ & 10000 \\
+MC samples & $N_{\text{mc}}$ & 1\,000 \\
 Oracle budget / trial &  & $10^{5}$ \\
 \bottomrule
 \end{tabular}
 \caption{Default hyper-parameters shared across all experiments.}
+\label{tab:hyperparams}
 \end{table}
