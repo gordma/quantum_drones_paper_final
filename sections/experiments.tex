@@ -6,8 +6,8 @@
 We construct a 30--40-node tactical delivery graph representing a realistic urban environment with battery constraints, payload limits, and regulatory no-fly zones.
 Using the soft-max route generator described in Section~\ref{sec:problem}, we produce $N = 2\,048$ feasible candidate routes, each fully respecting:
 \begin{itemize}[nosep]
-    \item Battery capacity: $B_{\max} = 80\,\text{Wh}$ with recharge rate $20\,\text{Wh/min}$
-    \item Payload limit: $Q_{\max} = 5\,\text{kg}$ per drone
+    \item Battery capacity: $B_{max} = 80\,\text{Wh}$ with recharge rate $20\,\text{Wh/min}$
+    \item Payload limit: $Q_{max} = 5\,\text{kg}$ per drone
     \item Wave scheduling: 4 discrete launch windows with inter-wave charging
     \item No-fly constraints: Embedded in graph adjacency
 \end{itemize}
@@ -43,17 +43,19 @@ Shallow circuits align with NISQ-era coherence limits while maintaining expressi
 
 \subsubsection{Risk-Aware Objective}
 Rather than optimizing the expectation $\mathbb{E}[C]$, we minimize the Conditional Value-at-Risk:
-\[
-\text{CVaR}_\alpha[C] = \mathbb{E}[C \mid C \geq \text{VaR}_\alpha[C]]
-\]
+\begin{equation*}
+    \text{CVaR}_\alpha[C] = \mathbb{E}[C \mid C \geq \text{VaR}_\alpha[C]]
+\end{equation*}
+
+
 with $\alpha \in \{0.05, 0.1, 1.0\}$ focusing optimization on worst-case tail costs.
 This naturally handles heteroscedastic noise from (i) quantum shot sampling and (ii) Monte Carlo route subset evaluation.
 
 \subsubsection{Bayesian Optimization}
 We employ Optuna's Aggressive TPE sampler with hyperparameters:
 \begin{itemize}
-    \item \texttt{prior_weight = 0.5} (aggressive exploration)
-    \item \texttt{n_ei_candidates = 36} (broad search)
+    \item \texttt{prior\_weight = 0.5} (aggressive exploration)
+    \item \texttt{n\_ei\_candidates = 36} (broad search)  
     \item \texttt{MedianPruner} with 90\% retention
 \end{itemize}
 

@@ -22,8 +22,8 @@ ending at the depot that satisfies
 c_{uv}=0 \;\forall(u,v)\in r.
 \]
 
-Given a pre‑computed pool of $\Nroutes$ feasible routes
-$\mathcal{R}=\{r_1,\dots,r_{\Nroutes}\}$ and $M=\Nwaves$ discrete launch
+Given a pre‑computed pool of $N_{routes}$ feasible routes
+$\mathcal{R}=\{r_1,\dots,r_{N_{routes}}\}$ and $M=N_{waves}$ discrete launch
 waves, the optimisation task is to
 
 \[
@@ -40,8 +40,8 @@ waves, the optimisation task is to
 
 where $C(\mathcal{S})$ is the mission cost defined in
 Eq.\,\eqref{eq:cost}.  The search space size is
-${\small\binom{\Nroutes}{k} M^{k}}$, motivating a logarithmic
-$\lceil\log_2\Nroutes\rceil+\lceil\log_2 M\rceil$‑qubit encoding for
+${\small\binom{N_{routes}}{k} M^{k}}$, motivating a logarithmic
+$\lceil\log_2 N_{routes}\rceil+\lceil\log_2 M\rceil$‑qubit encoding for
 quantum optimisation.
 
 \section{Methods}
