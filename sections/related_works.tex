@@ -1,0 +1,58 @@
+\section{Related Work}
+\label{sec:related_work}
+
+\subsection{Why direct QUBO formulations break down}
+Encoding routing and VRP variants as Quadratic Unconstrained Binary
+Optimisation (QUBO) explodes qubit requirements: a {\small4‑node,
+6‑edge} toy instance already needs several hundred binary variables once
+linearisation and penalty terms are introduced
+\cite{davies_quantum_2024}.  Besides qubit count, QUBO mappings suffer
+(i) delicate penalty tuning that creates large integrality gaps
+\cite{kochenberger2014qubo_review} and (ii) extra two‑qubit gates to
+embed logical connectivity onto hardware graphs such as Pegasus or
+heavy‑hex \cite{quinton2024annealing_limits}.
+
+\subsection{Qubit‑efficient encodings}
+Log‑index schemes compress variable counts from $O(N)$ to
+$O(\log N)$ qubits \cite{tan_qubit-efficient_2021,
+leonidas2024qubovrp}.  Applied to VRP/VRPTW, they achieve two‑order‑of‑magnitude
+reductions \cite{sundar_qubit-efficient_2024}.  The trade‑off is
+deeper circuits or surrogate cost functions that can re‑introduce
+approximation gaps.
+
+\subsection{Constraint‑preserving and dual‑hybrid approaches}
+Several authors eliminate penalty terms altogether via
+constraint‑preserving ansätze.  Examples include Lagrangian‑dual QAOA
+\cite{gabbassov2023}, QAOA++ custom mixers \cite{fuchs2022}, and
+“profit‑only” post‑correction loops \cite{chang2025} for VRP variants.
+
+\subsection{Model‑engineering and preprocessing in classical OR}
+Surveys on adaptive large‑neighbourhood search (ALNS)
+\cite{windras_mara_alns_2022} and modern matheuristics
+\cite{boschetti_matheuristics_2024} emphasise that destroy‑and‑repair
+operators, column generation and branch‑and‑price hybrids often deliver
+larger gains than raw solver speed—echoing Hildebrandt’s early claim
+that model implementation is the true bottleneck
+\cite{hildebrandt_bottleneck_1981}.
+
+\subsection{Black‑box hyper‑parameter optimisation}
+AutoML frameworks—Hyperopt, SMAC, Optuna \cite{akiba_optuna_2019}—have
+displaced manual parameter tuning in ML and OR.  In the quantum realm,
+Bayesian optimisation cuts QAOA evaluations by an order of magnitude
+\cite{tibaldi_bayes_qaoa_2023}, motivating our use of Optuna’s aggressive
+TPE sampler in a CVaR‑VQE setting.
+
+\subsection{Quantum samplers in hybrid pipelines}
+Recent work treats NISQ devices primarily as probabilistic samplers
+embedded in classical loops: Sampling‑QAOA \cite{matsuyama2025},
+Generator‑Enhanced Optimisation \cite{albarran2024}, and CVaR‑QAOA
+\cite{barkoutsos_improving_2020}.  Our pipeline follows this philosophy,
+combining log‑index encoding with risk‑aware objectives to exploit
+NISQ‑era hardware efficiently.
+
+\subsection{Alignment with probabilistic OR and generative AI}
+Cross‑entropy and generative‑model viewpoints are increasingly applied to
+combinatorial optimisation \cite{caramanis2023}.  This probabilistic
+stance mirrors industrial decision‑making, where operators trade
+expected cost against downside risk rather than chase a single
+deterministic optimum.

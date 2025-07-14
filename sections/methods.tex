@@ -1,6 +1,53 @@
 \section{Methods}
 
-\subsection{Overview}
+\subsection{Problem Definition: Subset‑Route Drone VRP}
+\label{sec:problem}
+
+Let $G=(V,E)$ be an undirected graph with depot node $0$ and
+$|V|-1$ customer nodes.  Each edge $(u,v)\in E$ is annotated with
+
+\[
+\bigl(t_{uv}, \; b_{uv}, \; c_{uv}\bigr)
+\qquad
+\text{travel time, battery usage, no‑fly flag.}
+\]
+
+A \emph{feasible route} $r\in\mathcal{R}$ is a simple cycle starting and
+ending at the depot that satisfies
+
+\[
+\textstyle
+\sum_{(u,v)\in r} b_{uv} \le B_{\max},
+\quad
+\sum_{v\in r} d_v \le Q_{\max},
+\quad
+c_{uv}=0 \;\forall(u,v)\in r.
+\]
+
+Given a pre‑computed pool of $\Nroutes$ feasible routes
+$\mathcal{R}=\{r_1,\dots,r_{\Nroutes}\}$ and $M=\Nwaves$ discrete launch
+waves, the optimisation task is to
+
+\[
+\underset{
+    \substack{\text{choose exactly }k\\ \text{route–wave pairs}}}
+    {\text{minimise}}
+\; C(\mathcal{S})
+\quad
+\text{s.t.}
+\;\;
+|\mathcal{S}|=k,\;
+\mathcal{S}\subseteq\mathcal{R}\times\{0,\dots,M-1\},
+\]
+
+where $C(\mathcal{S})$ is the mission cost defined in
+Eq.\,\eqref{eq:cost}.  The search space size is
+${\small\binom{\Nroutes}{k} M^{k}}$, motivating a logarithmic
+$\lceil\log_2\Nroutes\rceil+\lceil\log_2 M\rceil$‑qubit encoding for
+quantum optimisation.
+
+
+\subsection{Solution Overview}
 
 To avoid exponential qubit scaling, we split the drone routing problem into two stages. We first filter thousands of constraint-violating routes classically, then apply quantum optimization to select the best feasible subset. This hybrid approach reduces a 275-qubit QUBO problem to just 13 qubits while preserving solution quality.
 
